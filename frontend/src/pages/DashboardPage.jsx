@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
     // Start investigation mutation
     const startInvestigationMutation = useMutation({
-        mutationFn: investigationService.startInvestigation,
+        mutationFn: (params) => investigationService.startInvestigation(params),
         onMutate: () => {
             setIsInvestigationRunning(true);
         },

@@ -44,7 +44,7 @@ const HistoryPage = () => {
         refetch
     } = useQuery({
         queryKey: ['investigations-history'],
-        queryFn: historyService.getAllInvestigations,
+        queryFn: () => historyService.getAllInvestigations(),
         staleTime: 5 * 60 * 1000, // 5 minutes
     });
 
