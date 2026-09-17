@@ -26,6 +26,12 @@ Decision
     RootCause
     Recommendation
 
+Review
+    ReviewStatus
+    ReviewDecision
+    ReviewSubmission
+    ReviewAuditRecord
+
 Output
     InvestigationReport
 
@@ -58,6 +64,17 @@ from app.models.root_cause import RootCause
 from app.models.recommendation import Recommendation
 
 # ---------------------------------------------------------------------
+# Review Models
+# ---------------------------------------------------------------------
+
+from app.models.review import (
+    ReviewStatus,
+    ReviewDecision,
+    ReviewSubmission,
+    ReviewAuditRecord,
+)
+
+# ---------------------------------------------------------------------
 # Output Models
 # ---------------------------------------------------------------------
 
@@ -79,6 +96,12 @@ __all__ = [
     # Decision
     "RootCause",
     "Recommendation",
+
+    # Review
+    "ReviewStatus",
+    "ReviewDecision",
+    "ReviewSubmission",
+    "ReviewAuditRecord",
 
     # Output
     "InvestigationReport",

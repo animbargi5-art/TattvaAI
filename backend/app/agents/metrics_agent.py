@@ -239,11 +239,11 @@ class MetricsAgent(BaseAgent):
         # Error Rate
         #
 
-        if metric.is_error_rate and metric.exceeds(
-
-            self.ERROR_RATE_THRESHOLD
-
+        if metric.is_error_rate and (
+            metric.exceeds(self.ERROR_RATE_THRESHOLD)
+            or (metric.value <= 1.0 and metric.value * 100 >= self.ERROR_RATE_THRESHOLD)
         ):
+
 
             return self.create_evidence(
 

@@ -50,6 +50,7 @@ class InvestigationState(BaseModel):
     alerts: list[Alert] = Field(default_factory=list)
 
     historical_incidents: list[HistoricalIncident] = Field(default_factory=list)
+    historical_context: list[dict[str, Any]] = Field(default_factory=list)
 
     # -------------------------------------------------
     # Investigation
@@ -88,9 +89,21 @@ class InvestigationState(BaseModel):
     failed_agents: list[str] = Field(default_factory=list)
 
     # -------------------------------------------------
-    # Report
+    # Report & Review
     # -------------------------------------------------
 
     confidence: int = 0
 
     final_report: InvestigationReport | None = None
+
+    review_status: str = "PENDING_REVIEW"
+
+    review_decision: dict[str, Any] | None = None
+
+    selected_hypothesis: str | None = None
+
+    reviewer_notes: str | None = None
+
+    resolution: str | None = None
+
+    reviewed_at: str | None = None

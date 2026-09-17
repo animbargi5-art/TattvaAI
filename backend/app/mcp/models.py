@@ -66,6 +66,20 @@ class MCPTool(BaseModel):
 
     annotations: dict[str, Any] = Field(default_factory=dict)
 
+    def to_bedrock_spec(self) -> dict[str, Any]:
+        """
+        Convert tool definition to Amazon Bedrock Converse API toolSpecification format.
+        """
+        return {
+            "toolSpec": {
+                "name": self.name,
+                "description": self.description,
+                "inputSchema": {
+                    "json": self.input_schema,
+                },
+            }
+        }
+
 
 # ============================================================================
 # Tool Call Request
@@ -87,7 +101,7 @@ class MCPToolCall(BaseModel):
 
 class MCPToolResult(BaseModel):
     """
-    Result returned by an MCP tool.
+    Structured result returned by an MCP tool execution.
     """
 
     success: bool = True
@@ -102,7 +116,45 @@ class MCPToolResult(BaseModel):
 
     error: str | None = None
 
+    error_type: str | None = None
+
     execution_time_ms: float | None = None
+
+    @classmethod
+    def success_result(
+        cls,
+        tool_name: str,
+        structured_content: Any = None,
+        execution_time_ms: float | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> MCPToolResult:
+        """Create a successful structured tool result."""
+        return cls(
+            success=True,
+            tool_name=tool_name,
+            structured_content=structured_content,
+            execution_time_ms=execution_time_ms,
+            metadata=metadata or {},
+        )
+
+    @classmethod
+    def error_result(
+        cls,
+        tool_name: str,
+        error: str,
+        error_type: str | None = None,
+        execution_time_ms: float | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> MCPToolResult:
+        """Create an error structured tool result."""
+        return cls(
+            success=False,
+            tool_name=tool_name,
+            error=error,
+            error_type=error_type or "MCPToolError",
+            execution_time_ms=execution_time_ms,
+            metadata=metadata or {},
+        )
 
 
 # ============================================================================

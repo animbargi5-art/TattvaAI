@@ -1,0 +1,15 @@
+=================== TEST SUITE EXECUTION ===================
+Suite: test_aws_services              Ran: 10   Failures: 0  Errors: 0  [PASS]
+Suite: test_bedrock_reasoning         Ran: 14   Failures: 0  Errors: 0  [PASS]
+Suite: test_correlation_engine        Ran: 12   Failures: 0  Errors: 0  [PASS]
+Suite: test_investigation_memory      Ran: 15   Failures: 0  Errors: 0  [PASS]
+Suite: test_mcp                       Ran: 16   Failures: 0  Errors: 0  [PASS]
+Suite: test_telemetry_sources         Ran: 19   Failures: 0  Errors: 0  [PASS]
+Suite: test_human_review              Ran: 16   Failures: 0  Errors: 0  [PASS]
+Suite: test_aws_deployment            Ran: 12   Failures: 0  Errors: 0  [PASS]
+Suite: test_aws_live_deployment_prep  Ran: 12   Failures: 0  Errors: 0  [PASS]
+Suite: test_aws_account_connection_preflight Ran: 8    Failures: 0  Errors: 0  [PASS]
+Suite: test_logger                    Ran: 5    Failures: 0  Errors: 0  [PASS]
+============================================================
+GRAND TOTAL: 139 tests ran. Failures: 0, Errors: 0
+ALL TESTS PASSED SUCCESSFULLY!

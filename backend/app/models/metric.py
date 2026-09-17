@@ -127,7 +127,9 @@ class Metric(BaseModel):
         return (
             "latency" in self.metric_name.lower()
             or "duration" in self.metric_name.lower()
+            or "response_time" in self.metric_name.lower()
         )
+
 
     @property
     def is_error_rate(self) -> bool:

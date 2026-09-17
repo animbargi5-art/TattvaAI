@@ -19,6 +19,7 @@ import IncidentSummary from "../components/Investigation/IncidentSummary";
 import CorrelationPanel from "../components/Investigation/CorrelationPanel";
 import ReasoningPanel from "../components/Investigation/ReasoningPanel";
 import InvestigationGraph from "../components/Investigation/InvestigationGraph";
+import HumanReviewPanel from "../components/Investigation/HumanReviewPanel";
 
 export default function InvestigationPage() {
     const { id } = useParams();
@@ -189,6 +190,17 @@ export default function InvestigationPage() {
                 {/* Investigation Graph */}
                 <div className="col-12">
                     <InvestigationGraph investigation={investigation} />
+                </div>
+
+                {/* Human Review & Decision Panel */}
+                <div className="col-12">
+                    <HumanReviewPanel
+                        investigation={investigation}
+                        onReviewSubmitted={() => {
+                            refetch();
+                            queryClient.invalidateQueries(['investigation', id]);
+                        }}
+                    />
                 </div>
 
                 {/* Root Cause Panel */}

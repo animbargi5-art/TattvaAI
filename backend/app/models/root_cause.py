@@ -151,11 +151,17 @@ class RootCause(BaseModel):
     # -------------------------------------------------------------------------
 
     @property
+    def cause(self) -> str:
+        """
+        Alias for probable_cause for backward compatibility.
+        """
+        return self.probable_cause
+
+    @property
     def critical(self) -> bool:
         """
         Returns True for critical root causes.
         """
-
         return self.severity.upper() == "CRITICAL"
 
     @property
@@ -163,7 +169,6 @@ class RootCause(BaseModel):
         """
         Returns True when AI confidence is high.
         """
-
         return self.confidence >= 90
 
     @property
@@ -171,7 +176,6 @@ class RootCause(BaseModel):
         """
         Returns True when multiple services are affected.
         """
-
         return len(self.impacted_services) > 1
 
     @property
@@ -179,7 +183,6 @@ class RootCause(BaseModel):
         """
         Returns True when AI reasoning is available.
         """
-
         return len(self.reasoning) > 0
 
     # -------------------------------------------------------------------------
@@ -193,7 +196,6 @@ class RootCause(BaseModel):
         """
         Adds a supporting correlation and updates statistics.
         """
-
         self.correlations.append(correlation)
         self.correlation_count = len(self.correlations)
 
@@ -206,7 +208,6 @@ class RootCause(BaseModel):
         """
         Returns a concise human-readable summary.
         """
-
         return (
             f"{self.service_name} | "
             f"{self.cause_type} | "

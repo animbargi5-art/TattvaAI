@@ -14,6 +14,7 @@ It combines every stage of the investigation including:
 • Correlations
 • Root Causes
 • Recommendations
+• Historical Context
 
 This model is transport-independent and represents the canonical
 investigation report inside TattvaAI.
@@ -23,6 +24,8 @@ Flow
 Evidence
         ↓
 Correlation Engine
+        ↓
+Investigation Memory
         ↓
 Root Cause Engine
         ↓
@@ -98,6 +101,26 @@ class InvestigationReport(BaseModel):
     recommendations: list[Recommendation] = Field(
         default_factory=list
     )
+
+    historical_context: list[dict] = Field(
+        default_factory=list
+    )
+
+    # -------------------------------------------------------------------------
+    # Human Review & Decision
+    # -------------------------------------------------------------------------
+
+    review_status: str = "PENDING_REVIEW"
+
+    review_decision: Optional[dict] = None
+
+    selected_hypothesis: Optional[str] = None
+
+    reviewer_notes: Optional[str] = None
+
+    resolution: Optional[str] = None
+
+    reviewed_at: Optional[datetime] = None
 
     # -------------------------------------------------------------------------
     # Investigation Timeline

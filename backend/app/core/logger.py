@@ -16,17 +16,38 @@ Goals:
 ===============================================================================
 """
 
+import os
 import logging
 import logging.config
 from pathlib import Path
 
 
 # =============================================================================
-# Log Directory
+# Log Directory & Lambda Environment Detection
 # =============================================================================
 
-LOG_DIR = Path("logs")
-LOG_DIR.mkdir(exist_ok=True)
+# When running in AWS Lambda (/var/task is read-only), avoid creating local ./logs.
+# Detect Lambda environment via standard AWS_LAMBDA_FUNCTION_NAME.
+IS_LAMBDA = bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
+if IS_LAMBDA:
+    # Use /tmp if file logging is ever required in Lambda; do not require writes on startup
+    LOG_DIR = Path("/tmp/tattvaai_logs")
+else:
+    LOG_DIR = Path("logs")
+    try:
+        LOG_DIR.mkdir(exist_ok=True)
+    except Exception:
+        pass
+
+
+def ensure_log_dir() -> Path:
+    """Ensure the log directory exists and return its path."""
+    try:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+    return LOG_DIR
 
 
 # =============================================================================

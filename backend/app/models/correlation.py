@@ -50,6 +50,12 @@ class Correlation(BaseModel):
 
     investigation_id: Optional[str] = None
 
+    source_evidence_id: Optional[str] = None
+
+    target_evidence_id: Optional[str] = None
+
+    relationship: Optional[str] = None
+
     # -------------------------------------------------------------------------
     # Target Service
     # -------------------------------------------------------------------------

@@ -151,7 +151,7 @@ async def investigation_node(
     state: InvestigationState,
 ) -> InvestigationState:
 
-    return investigation_engine.execute(state)
+    return await investigation_engine.execute(state)
 
 
 # ============================================================================

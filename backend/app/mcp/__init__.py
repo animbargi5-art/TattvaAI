@@ -63,12 +63,22 @@ from app.mcp.session import (
     mcp_session,
 )
 
-from app.mcp.tools import MCPToolExecutor
+from app.mcp.client import MCPClient
+from app.mcp.tools import (
+    MCPToolExecutor,
+    TelemetryMCPDispatcher,
+    TELEMETRY_MCP_TOOLS,
+    get_telemetry_mcp_tools,
+    get_telemetry_bedrock_specs,
+)
 
 __all__ = [
     # Configuration
     "MCPConfig",
     "mcp_config",
+
+    # Client
+    "MCPClient",
 
     # Models
     "MCPServerInfo",
@@ -102,6 +112,10 @@ __all__ = [
     "MCPSession",
     "mcp_session",
 
-    # Tool Executor
+    # Tool Executor & Dispatcher
     "MCPToolExecutor",
+    "TelemetryMCPDispatcher",
+    "TELEMETRY_MCP_TOOLS",
+    "get_telemetry_mcp_tools",
+    "get_telemetry_bedrock_specs",
 ]

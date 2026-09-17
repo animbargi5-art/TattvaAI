@@ -54,7 +54,7 @@ def setup_tracing(app):
 
     # In demo mode, use console exporters instead of OTLP
     if settings.DEMO_MODE:
-        print("🎯 Running in DEMO MODE - Using console exporters for telemetry")
+        print("[INFO] Running in DEMO MODE - Using console exporters for telemetry")
         
         # Import console exporters
         from opentelemetry.sdk.trace.export import ConsoleSpanExporter
@@ -85,11 +85,11 @@ def setup_tracing(app):
         logger_provider.add_log_record_processor(BatchLogRecordProcessor(console_log_exporter))
         set_logger_provider(logger_provider)
 
-        print("✅ OpenTelemetry initialized in DEMO MODE (Console exporters)")
+        print("[OK] OpenTelemetry initialized in DEMO MODE (Console exporters)")
         
     else:
         # Production mode with OTLP exporters
-        print("🚀 Running in PRODUCTION MODE - Using OTLP exporters")
+        print("[INFO] Running in PRODUCTION MODE - Using OTLP exporters")
         
         # -----------------------------
         # Tracing

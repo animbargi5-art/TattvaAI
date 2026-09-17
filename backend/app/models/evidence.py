@@ -169,7 +169,6 @@ class Evidence(BaseModel):
         """
         Returns True when evidence is CRITICAL.
         """
-
         return self.severity.upper() == "CRITICAL"
 
     @property
@@ -177,7 +176,6 @@ class Evidence(BaseModel):
         """
         Returns True when evidence is HIGH.
         """
-
         return self.severity.upper() == "HIGH"
 
     @property
@@ -185,7 +183,6 @@ class Evidence(BaseModel):
         """
         Returns True when evidence is MEDIUM.
         """
-
         return self.severity.upper() == "MEDIUM"
 
     @property
@@ -193,15 +190,20 @@ class Evidence(BaseModel):
         """
         Returns True when evidence is LOW.
         """
-
         return self.severity.upper() == "LOW"
+
+    @property
+    def slow(self) -> bool:
+        """
+        Returns True when evidence indicates elevated latency or slow performance.
+        """
+        return "slow" in (self.type or "").lower() or float(self.raw.get("duration_ms", 0.0)) >= 1000.0
 
     @property
     def reliable(self) -> bool:
         """
         Returns True when the evidence confidence is high.
         """
-
         return self.confidence >= 80
 
     @property
@@ -209,7 +211,6 @@ class Evidence(BaseModel):
         """
         Returns True when the evidence confidence is low.
         """
-
         return self.confidence < 50
 
     # -------------------------------------------------------------------------
@@ -220,7 +221,6 @@ class Evidence(BaseModel):
         """
         Returns a concise human-readable summary.
         """
-
         return (
             f"[{self.severity}] "
             f"{self.service_name} - "

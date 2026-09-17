@@ -10,9 +10,21 @@ build/
 # TattvaAI Specific - Development & Internal Files
 # =============================================================================
 
-# Architecture Documentation (Internal) - All MD files except README
+# Architecture Documentation - Keep README and docs/
 *.md
 !README.md
+!docs/*.md
+!docs/**/*.md
+
+# Database and Secrets
+*.db
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+.env
+.env.*
+!.env.example
 
 # Demo and Testing (Internal Development Only)
 demo/
@@ -40,3 +52,10 @@ logs/
 # Build Artifacts
 build/
 dist/
+# Generated AWS/local artifacts
+backend/function.zip
+backend/tattvaai.db
+
+# Local build and development artifacts
+backend/package/
+scratch/

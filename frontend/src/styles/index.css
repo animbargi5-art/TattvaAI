@@ -45,6 +45,7 @@
 @import './components/investigation/root-cause-panel.css';
 @import './components/investigation/summary-panel.css';
 @import './components/investigation/timeline-panel.css';
+@import './components/investigation/human-review-panel.css';
 
 /* Report components */
 @import './components/reports/report-stat-card.css';

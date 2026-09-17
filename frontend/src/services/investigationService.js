@@ -84,6 +84,18 @@ class InvestigationService {
         });
         return response.data;
     }
+
+    // Get human review state
+    async getReview(id) {
+        const response = await api.get(`${this.baseEndpoint}/${id}/review`);
+        return response.data;
+    }
+
+    // Submit human review decision
+    async submitReview(id, reviewData) {
+        const response = await api.post(`${this.baseEndpoint}/${id}/review`, reviewData);
+        return response.data;
+    }
 }
 
 export default new InvestigationService();

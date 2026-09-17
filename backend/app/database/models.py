@@ -56,3 +56,70 @@ class Investigation(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+
+class ReviewRecord(Base):
+    """
+    Persistent audit record of human review decisions.
+    """
+
+    __tablename__ = "review_records"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    review_id = Column(
+        String,
+        index=True,
+        nullable=False
+    )
+
+    investigation_id = Column(
+        String,
+        index=True,
+        nullable=False
+    )
+
+    old_status = Column(
+        String,
+        nullable=False,
+        default="PENDING_REVIEW"
+    )
+
+    new_status = Column(
+        String,
+        nullable=False
+    )
+
+    selected_hypothesis = Column(
+        String,
+        nullable=True
+    )
+
+    reviewer_notes = Column(
+        String,
+        nullable=True
+    )
+
+    reviewer_identifier = Column(
+        String,
+        nullable=True
+    )
+
+    resolution_summary = Column(
+        String,
+        nullable=True
+    )
+
+    recommendation_decisions = Column(
+        JSON,
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )

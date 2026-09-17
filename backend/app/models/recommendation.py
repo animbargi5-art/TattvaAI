@@ -139,7 +139,15 @@ class Recommendation(BaseModel):
         return self.priority.upper() == "HIGH"
 
     @property
+    def type(self) -> str:
+        """
+        Alias for category.
+        """
+        return self.category
+
+    @property
     def immediate(self) -> bool:
+
         """
         Returns True when immediate action is required.
         """
