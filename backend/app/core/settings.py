@@ -58,6 +58,15 @@ class Settings(BaseSettings):
     # Frontend Origin for strict CORS enforcement
     FRONTEND_ORIGIN: str = ""
 
+    # Authentication & JWT Configuration
+    JWT_SECRET_KEY: str = "tattvaai-jwt-secret-key-change-in-prod-super-secure"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_DAYS: int = 7
+    USERS_TABLE_NAME: str = Field(
+        default="tattvaai_users",
+        validation_alias=AliasChoices("USERS_TABLE_NAME", "USERS_TABLE"),
+    )
+
     @property
     def DYNAMODB_TABLE(self) -> str:
         """Alias property for canonical DYNAMODB_TABLE_NAME."""

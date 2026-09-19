@@ -1,392 +1,237 @@
 # 🚀 TattvaAI
 
-### AI-Powered Incident Investigation Platform
+### AI-Powered Incident Investigation Platform for SREs & On-Call Teams
 
-**Transform hours of manual incident investigation into minutes of intelligent analysis**
+**From alert to verified root cause in 30 seconds — backed by real telemetry, zero hallucinations.**
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
-![AWS](https://img.shields.io/badge/AWS-Serverless-FF9900?style=for-the-badge&logo=amazon-aws)
-![SigNoz](https://img.shields.io/badge/SigNoz-Integrated-FF6B35?style=for-the-badge)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![AWS Serverless](https://img.shields.io/badge/AWS-Serverless-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
+[![Amazon Bedrock](https://img.shields.io/badge/Amazon-Bedrock-527FFF?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/bedrock)
+[![SigNoz](https://img.shields.io/badge/SigNoz-Integrated-FF6B35?style=for-the-badge)](https://signoz.io)
 
 ---
 
 ## 🎯 What is TattvaAI?
 
-TattvaAI is a comprehensive AI-powered incident investigation platform that automates the complex process of analyzing production incidents. Instead of manually searching through distributed traces, logs, and metrics for hours, our specialized AI agents work together to quickly identify root causes and provide actionable solutions.
+When production breaks at 2 AM, on-call engineers typically spend 2 to 4 hours frantically juggling tools:
+- Digging through distributed traces across multiple microservices
+- Grepping through megabytes of CloudWatch or SigNoz logs
+- Comparing metric spikes and dashboards against normal baselines
+- Trying to remember if this exact issue happened three months ago
 
-### The Problem We Solve
-When production systems fail, engineering teams typically spend 2-4 hours:
-- 🔍 Searching through distributed traces across multiple services
-- 📜 Reading thousands of log entries to find error patterns  
-- 📊 Analyzing metric dashboards for performance anomalies
-- 🌐 Checking service dependencies and failure propagation
-- 🕐 Comparing with historical incidents and known patterns
+**TattvaAI automates this entire triage and investigation process in under 30 seconds.**
 
-### Our AI-Powered Solution
-TattvaAI's multi-agent system completes this analysis in under 30 seconds:
-- 🤖 **6 Specialized AI Agents** analyze different telemetry aspects
-- 🧠 **Evidence-Based Reasoning** with transparent decision making
-- 🎯 **Root Cause Identification** with confidence scoring
-- 📋 **Actionable Recommendations** for immediate and long-term fixes
-- 🔄 **Historical Pattern Learning** to improve future investigations
+Instead of manual guessing, TattvaAI orchestrates **6 specialized AI agents** that simultaneously query and correlate traces, logs, metrics, service dependencies, active alerts, and past incident history. An evidence-based reasoning engine powered by **Amazon Bedrock** links the data points into an unambiguous causal chain, estimates a confidence score, and gives you prioritized, actionable remediation steps.
 
 ---
 
-## ✨ Key Features
+## ✨ Core Highlights
 
-🎭 **Multi-Agent Investigation System**  
-Six specialized AI agents collaborate to analyze traces, logs, metrics, dependencies, alerts, and historical patterns
-
-🧠 **Intelligent Evidence Correlation**  
-Advanced reasoning engine connects findings across all telemetry sources with transparent logic
-
-🎯 **Automated Root Cause Analysis**  
-AI-powered analysis identifies likely causes with confidence scores and supporting evidence
-
-📊 **Complete SigNoz Integration**  
-Native integration with SigNoz observability platform using Model Context Protocol (MCP)
-
-⚡ **Lightning-Fast Results**  
-Complete incident investigations in 10-30 seconds with detailed analysis and recommendations
-
-🔄 **Learning Memory System**  
-Builds knowledge from past incidents to improve accuracy and speed over time
-
-🎨 **Professional Dashboard Interface**  
-Modern React-based UI with real-time investigation tracking and comprehensive reporting
-
-🔧 **Production-Ready Architecture**  
-Serverless architecture on AWS Lambda, API Gateway, DynamoDB, S3, and AWS Amplify with end-to-end observability and resilience
+- 🤖 **6 Specialized Investigation Agents**: Dedicated agents analyze Traces, Logs, Metrics, Service Dependencies, Alerts, and Historical Incident Patterns concurrently.
+- 🔒 **Zero Telemetry Hallucinations**: Every observation, hypothesis, and recommendation is strictly linked to a concrete `evidence_id` retrieved directly from your observability stack.
+- 🧠 **Amazon Bedrock Reasoning**: Formulates step-by-step causal explanations, separates symptoms from root causes, and highlights known uncertainties.
+- 👤 **Human-in-the-Loop Review**: AI never blindly modifies production. SREs can accept, reject, or comment on findings before any remediation executes.
+- ☁️ **100% Serverless on AWS**: Runs on AWS Lambda, Amazon API Gateway, DynamoDB, S3, and AWS Amplify — zero servers to patch or idle compute costs.
+- 📄 **One-Click Post-Mortem Reports**: Instantly export complete investigation reports to PDF, JSON, or Markdown for post-mortems and compliance.
+- 🔌 **Multi-Provider Telemetry**: Works seamlessly with **AWS Observability** (CloudWatch Logs/Metrics + AWS X-Ray), **SigNoz OTLP**, or an offline **Demo/Mock mode** for training.
 
 ---
 
-## 🚀 Quick Start
+## 🏗️ Architecture
 
-### Local Development Setup
+```
+                       ┌─────────────────────────┐
+                       │     React 19 + Vite     │
+                       │      (AWS Amplify)      │
+                       └────────────┬────────────┘
+                                    │ HTTPS REST / SSE
+                                    ▼
+                       ┌─────────────────────────┐
+                       │   Amazon API Gateway    │
+                       └────────────┬────────────┘
+                                    │ AWS Proxy
+                                    ▼
+                       ┌─────────────────────────┐
+                       │   FastAPI on Lambda     │
+                       │    (TattvaAI-Backend)   │
+                       └────────────┬────────────┘
+                                    │
+    ┌───────────────────────────────┼───────────────────────────────┐
+    ▼                               ▼                               ▼
+┌───────────────────────┐  ┌───────────────────────┐  ┌───────────────────────┐
+│   Telemetry Source    │  │   Reasoning Engine    │  │     Persistence       │
+│  - AWS CloudWatch     │  │  - Amazon Bedrock     │  │  - AWS DynamoDB       │
+│  - AWS X-Ray          │  │    (Claude Sonnet)    │  │    (Investigations)   │
+│  - SigNoz / OTLP      │  │  - Offline Fallback   │  │  - AWS S3 (Reports)   │
+│  - Mock / Demo Mode   │  │                       │  │  - Secrets Manager    │
+└───────────────────────┘  └───────────────────────┘  └───────────────────────┘
+```
 
+---
+
+## 🤖 The 6 Investigation Agents
+
+1. **🔍 Trace Agent**: Analyzes distributed traces across service boundaries, flags slow endpoints, HTTP 5xx spikes, and highlights where latency compounds.
+2. **📜 Logs Agent**: Scans application log streams for fatal exceptions, timeout patterns, and error frequency bursts.
+3. **📊 Metrics Agent**: Tracks CPU saturation, memory leaks, throughput cliffs, and threshold violations against historical baselines.
+4. **🌐 Dependency Agent**: Generates real-time service dependency graphs to distinguish root failure originators from cascading downstream victims.
+5. **🚨 Alert Agent**: Groups related alerts across monitoring systems, calculates noise reduction, and isolates the trigger alert.
+6. **🧠 Historical Agent**: Matches current telemetry anomalies against resolved past incidents to surface proven runbooks and mitigations.
+
+---
+
+## 🚀 Getting Started
+
+You can run TattvaAI locally for development or access the deployed AWS serverless environment.
+
+### Option 1: Local Development
+
+#### 1. Clone the repository
 ```bash
-# 1. Clone the repository
-git clone https://github.com/animbargi5-art/AI-Observability-Agent-.git TattvaAI
+git clone https://github.com/animbargi5-art/TattvaAI.git
 cd TattvaAI
-
-# 2. Start Backend (FastAPI)
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# 3. Start Frontend (React + Vite, in a new terminal)
-cd ../frontend
-npm install
-npm run dev
 ```
 
-### Access Your TattvaAI Instance
-- **🎨 Main Dashboard**: http://localhost:5173 (or http://localhost:3001)
-- **🔧 Backend API**: http://localhost:8000
-- **📚 API Documentation**: http://localhost:8000/docs
-- **❤️ Health Check**: http://localhost:8000/health
-
-### Live AWS Serverless Deployment
-TattvaAI is deployed natively on AWS serverless infrastructure:
-- **Frontend**: AWS Amplify (React 19 + Vite + PrimeReact)
-- **Backend**: AWS Lambda (`TattvaAI-Backend`) via API Gateway
-- **API Gateway Endpoint**: `https://eodackuif2.execute-api.us-east-1.amazonaws.com`
-- **Reasoning**: Amazon Bedrock (`Claude 3.7 Sonnet`)
-- **Persistence**: DynamoDB (`tattvaai_investigations`) & S3 (`tattvaai-investigation-reports`)
-- **Telemetry**: AWS Observability (CloudWatch / X-Ray) & SigNoz OTLP
-
-For full deployment instructions, see [docs/AWS_DEPLOYMENT.md](file:///d:/Projects/TattvaAI/docs/AWS_DEPLOYMENT.md).
-
----
-
-## 🎭 Live Demo Experience
-
-### Scenario: E-commerce Platform Investigation
-**Problem**: Customers reporting checkout failures and payment timeouts
-
-### TattvaAI's 30-Second Investigation:
-
-1. **🔍 Trace Agent Analysis**
-   - Discovers 4.8s average latency (400% increase from baseline 120ms)  
-   - Identifies timeout patterns in payment service calls
-   - Maps request flow: Gateway → Order → Payment → Database
-
-2. **📜 Logs Agent Findings**
-   - Detects 143 Redis connection timeout errors
-   - Correlates error spikes with traffic patterns
-   - Identifies specific error codes and frequencies
-
-3. **📊 Metrics Agent Insights** 
-   - Reports 18% error rate across payment endpoints
-   - Shows 98% Redis CPU utilization during incidents
-   - Tracks memory usage spikes in payment service
-
-4. **🌐 Dependency Agent Mapping**
-   - Creates service dependency graph
-   - Identifies failure propagation path
-   - Highlights critical path vulnerabilities
-
-5. **🚨 Alert Agent Correlation**
-   - Links 7 related alerts across monitoring systems
-   - Reduces alert noise by 85%
-   - Prioritizes critical vs. secondary alerts
-
-6. **🧠 Historical Agent Pattern Matching**
-   - Finds 94% similarity to incident from 3 months ago
-   - Retrieves previous resolution strategy
-   - Suggests proven remediation steps
-
-### Investigation Results:
-**Root Cause**: Redis connection pool exhaustion causing cascading payment failures  
-**Confidence Score**: 96%  
-**Time to Resolution**: 28 seconds
-
-**AI-Generated Recommendations**:
-- **Immediate**: Restart Redis cluster and clear connection pool
-- **Short-term**: Increase connection pool size and timeout thresholds  
-- **Long-term**: Implement circuit breaker pattern and connection monitoring
-
----
-
-## 🏗️ System Architecture
-
-### Multi-Agent Intelligence Framework
-```
-Production Incident
-         ↓
-   AI Coordinator
-         ↓
-   ┌─────────────────────────┐
-   │    Agent Ecosystem      │
-   │                         │
-   │  🔍 Trace Agent         │ ← Distributed traces analysis
-   │  📜 Logs Agent          │ ← Error pattern detection  
-   │  📊 Metrics Agent       │ ← Performance monitoring
-   │  🌐 Dependency Agent    │ ← Service topology mapping
-   │  🚨 Alert Agent         │ ← Multi-source alert correlation
-   │  🧠 Historical Agent    │ ← Pattern matching & learning
-   └─────────────────────────┘
-         ↓
-   Evidence Synthesis
-         ↓
-   Reasoning Engine
-         ↓
-   Root Cause + Confidence
-         ↓
-   Actionable Recommendations
-```
-
-### Technology Stack
-- **🐍 Backend**: Python 3.12, FastAPI, LangGraph, LangChain
-- **⚛️ Frontend**: React 19, TypeScript, Vite, Modern UI Components  
-- **🤖 AI/ML**: Multi-Agent System, Evidence-Based Reasoning, Memory Networks
-- **📊 Observability**: SigNoz Native Integration, OpenTelemetry, MCP Protocol
-- **☁️ Infrastructure**: AWS Lambda, API Gateway, AWS Amplify, DynamoDB, S3, Secrets Manager
-- **💾 Data**: PostgreSQL / DynamoDB, Investigation Memory, Historical Pattern Storage
-
-### Microservices Demo Environment
-TattvaAI includes a complete e-commerce microservices environment for realistic testing:
-- **Gateway Service** (Port 8011): API routing and load balancing
-- **Order Service** (Port 8003): Order processing and workflow management  
-- **Payment Service** (Port 8004): Payment processing and validation
-- **Inventory Service** (Port 8002): Stock management and allocation
-- **All services** instrumented with OpenTelemetry for full observability
-
----
-
-## 🛠️ Development & Integration
-
-### Local Development Setup
+#### 2. Start Backend (FastAPI)
 ```bash
-# Backend development
 cd backend
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+Backend API will be running at `http://localhost:8000` (OpenAPI docs at `http://localhost:8000/docs`).
 
-# Frontend development  
+#### 3. Start Frontend (React + Vite)
+In a new terminal:
+```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-### Environment Configuration
-Create `backend/.env`:
-```env
-APP_NAME=TattvaAI
-APP_VERSION=1.0.0
-ENVIRONMENT=development
-DEBUG=true
-DEMO_MODE=false
-```
-
-### API Integration Examples
-
-**Start Investigation**:
-```python
-import requests
-
-# Start AI investigation
-response = requests.post("http://localhost:8000/investigation/start", 
-    json={"service_name": "payment-service"})
-
-result = response.json()
-print(f"Investigation ID: {result['id']}")
-print(f"Status: {result['status']}")  
-print(f"Root Cause: {result['root_cause']}")
-print(f"Confidence: {result['confidence']}%")
-```
-
-**Get Dashboard Statistics**:
-```bash
-curl http://localhost:8000/dashboard/statistics
-# Returns: investigation counts, severity breakdown, confidence metrics
-```
-
-**Retrieve Investigation Details**:
-```bash
-curl http://localhost:8000/investigation/{investigation_id}
-# Returns: complete evidence, reasoning, timeline, recommendations
-```
+Open `http://localhost:5173` to access the TattvaAI dashboard.
 
 ---
 
-## 📊 Application Structure
+### Option 2: Live AWS Serverless Deployment
+
+TattvaAI is deployed in `us-east-1` using native AWS services:
+
+| Component | AWS Resource | Status |
+| :--- | :--- | :--- |
+| **API Gateway** | `https://eodackuif2.execute-api.us-east-1.amazonaws.com` | **LIVE** |
+| **Backend Lambda** | `TattvaAI-Backend` (Python 3.10 + Mangum) | **LIVE** |
+| **Database** | DynamoDB table `tattvaai_investigations` | **ACTIVE** |
+| **Reports Bucket** | S3 bucket `tattvaai-investigation-reports` | **ACTIVE** |
+| **AI Reasoning** | Amazon Bedrock (`us.anthropic.claude-sonnet-4-6`) | **ACTIVE** |
+| **Telemetry** | AWS Observability (CloudWatch + AWS X-Ray) | **LIVE** |
+| **Frontend UI** | AWS Amplify Hosting (React 19 SPA) | **DEPLOYED** |
+
+For detailed AWS setup, IAM policies, and infrastructure configuration, see [docs/AWS_DEPLOYMENT.md](docs/AWS_DEPLOYMENT.md).
+
+---
+
+## 🎭 Live Incident Walkthrough
+
+### Scenario: Payment Service Outage
+**Symptom**: Customer checkouts are failing with HTTP 504 Gateway Timeouts.
+
+1. **Investigation Triggered**:
+   ```bash
+   curl -X POST "https://eodackuif2.execute-api.us-east-1.amazonaws.com/investigation/start?service_name=payment-service" \
+     -H "Content-Type: application/json" \
+     -d '{"telemetry_source": "aws", "environment": "Production", "time_window": "1h"}'
+   ```
+2. **Investigation Findings**:
+   - **X-Ray**: Discovers 6,697ms latency on downstream `TattvaAI-Backend` call (`ev-trace-1-6aaed111-1439dcb00f13d6242225c3b2`).
+   - **CloudWatch**: Detects active `AWS/Lambda/Errors` alarm (`ev-metric-AWS/Lambda/Errors-2`).
+   - **Dependency Graph**: Reveals `payment-service` waiting on external partner response, exhausting connection pool.
+   - **Historical Match**: Correlates 40% pattern similarity with past resolved incident `INC-HIST-082`.
+3. **Diagnosis**:
+   - **Root Cause**: Downstream latency and error propagation in `TattvaAI-Backend` causing connection pool starvation in `payment-service`.
+   - **Confidence**: 88%
+   - **Immediate Fix**: Enable circuit breaker with fast-fallback on partner integration.
+4. **Human Review**:
+   On-call engineer reviews the evidence in the UI, clicks **Accept Mitigation**, and downloads the post-mortem PDF.
+
+---
+
+## 🛠️ REST API Quick Reference
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | System health check (`{"status": "healthy"}`) |
+| `GET` | `/telemetry/providers` | List available telemetry sources and status |
+| `POST` | `/telemetry/providers/test` | Test live connectivity to AWS, SigNoz, or OTLP |
+| `POST` | `/investigation/start` | Launch a new multi-agent investigation |
+| `GET` | `/investigation/{id}` | Get full investigation state, evidence, and root causes |
+| `GET` | `/investigation/history` | Query past investigations from DynamoDB |
+| `GET` | `/investigation/{id}/review` | Fetch human review status and notes |
+| `POST` | `/investigation/{id}/review` | Submit human engineer decision (`ACCEPTED` / `REJECTED`) |
+| `GET` | `/investigation/{id}/export/pdf` | Download formatted PDF incident post-mortem |
+| `GET` | `/investigation/{id}/export/json` | Export raw JSON investigation report |
+| `GET` | `/investigation/{id}/export/markdown` | Export Markdown post-mortem document |
+
+---
+
+## 📁 Repository Structure
 
 ```
 TattvaAI/
-├── backend/                    # Python FastAPI backend
+├── backend/                    # FastAPI backend
 │   ├── app/
-│   │   ├── agents/            # 🤖 6 AI investigation agents
-│   │   │   ├── trace_agent.py      # Distributed trace analysis
-│   │   │   ├── logs_agent.py       # Log pattern detection
-│   │   │   ├── metrics_agent.py    # Performance monitoring
-│   │   │   ├── dependency_agent.py # Service mapping
-│   │   │   ├── alert_agent.py      # Alert correlation
-│   │   │   └── historical_agent.py # Pattern matching
-│   │   ├── api/               # 🔧 REST API endpoints  
-│   │   │   ├── investigation.py    # Investigation management
-│   │   │   ├── dashboard.py        # Dashboard statistics
-│   │   │   └── signoz.py          # SigNoz integration
-│   │   ├── coordinator/       # 🎭 Multi-agent orchestration
-│   │   ├── decision/          # 🧠 Reasoning engines
-│   │   ├── memory/            # 💾 Investigation memory
-│   │   ├── signoz/            # 📊 SigNoz MCP integration
-│   │   ├── graph/             # 🌐 LangGraph workflows
-│   │   └── models/            # 📋 Data models & schemas
-│   └── requirements.txt       
-├── frontend/                   # React TypeScript frontend
+│   │   ├── agents/            # 6 Specialized AI investigation agents
+│   │   ├── api/               # REST API route handlers
+│   │   ├── coordinator/       # Agent pipeline orchestrator
+│   │   ├── database/          # DynamoDB & SQLite repository layer
+│   │   ├── decision/          # Amazon Bedrock reasoning provider
+│   │   ├── models/            # Pydantic & SQLAlchemy data models
+│   │   ├── schemas/           # Request/response schemas & contracts
+│   │   ├── services/          # DynamoDB, S3, Secrets Manager, and export services
+│   │   └── telemetry/         # AWS Observability (X-Ray/CW) & SigNoz providers
+│   ├── lambda_handler.py      # AWS Lambda entrypoint (Mangum ASGI adapter)
+│   └── requirements.txt       # Python dependencies
+├── frontend/                   # React 19 + Vite dashboard
 │   ├── src/
-│   │   ├── components/        # ⚛️ React UI components
-│   │   │   ├── Dashboard/         # Main dashboard interface
-│   │   │   ├── Investigation/     # Investigation detail views
-│   │   │   ├── History/           # Investigation history
-│   │   │   └── Reports/           # Analytics & reporting
-│   │   ├── pages/             # 📄 Application pages
-│   │   ├── services/          # 🔌 API integration
-│   │   └── styles/            # 🎨 Component styling
-│   └── package.json           
-├── services/                   # 🏪 Demo microservices environment
-│   ├── gateway/               # API gateway service
-│   ├── order/                 # Order processing service
-│   ├── payment/               # Payment service
-│   └── inventory/             # Inventory management
-├── infra/                      # ☁️ AWS IAM & deployment policies
-├── docs/AWS_DEPLOYMENT.md     # 📖 Complete AWS serverless guide
-└── DEMO_GUIDE.txt            # 🎬 Complete demo instructions
+│   │   ├── components/        # PrimeReact UI components & investigation panels
+│   │   ├── pages/             # Dashboard, Investigation, History, Reports, Settings
+│   │   ├── services/          # API service clients
+│   │   └── styles/            # Glassmorphism & PrimeReact dark theme styling
+│   ├── package.json           # Frontend dependencies
+│   └── vite.config.js          # Vite bundler configuration
+├── infra/                      # AWS Infrastructure
+│   └── aws/
+│       ├── lambda-policy.json # Least-privilege IAM execution policy
+│       └── trust-policy.json  # Lambda service assume-role policy
+├── services/                   # Sample microservices for telemetry simulation
+│   ├── gateway/               # API gateway mock service
+│   ├── order/                 # Order service
+│   ├── payment/               # Payment processing service
+│   └── inventory/             # Inventory service
+├── docs/                       # Comprehensive documentation
+│   └── AWS_DEPLOYMENT.md      # Step-by-step AWS deployment guide
+├── .env.example                # Environment variables template
+├── amplify.yml                 # AWS Amplify frontend build configuration
+├── DEMO_GUIDE.txt             # Manual testing and demo walkthrough guide
+└── README.md                  # Project overview (this file)
 ```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions to TattvaAI! Here's how to get started:
-
-1. **Fork the Repository**: Click the fork button on GitHub
-2. **Create Feature Branch**: `git checkout -b feature/amazing-feature`
-3. **Make Your Changes**: Implement your feature or fix
-4. **Add Tests**: Ensure your changes are tested
-5. **Commit Changes**: `git commit -m 'Add amazing feature'`
-6. **Push to Branch**: `git push origin feature/amazing-feature`  
-7. **Open Pull Request**: Submit your changes for review
-
-### Development Guidelines
-- Follow Python PEP 8 style guidelines
-- Add docstrings to all functions and classes
-- Include unit tests for new features  
-- Update documentation for API changes
-- Ensure frontend and backend validation checks pass successfully
-
----
-
-## 🌟 Why Choose TattvaAI?
-
-### For SRE & DevOps Teams
-- **Faster Resolution**: Reduce MTTR from hours to minutes
-- **Consistent Methodology**: Standardized investigation approach across team
-- **Knowledge Preservation**: AI learns and retains team expertise
-- **24/7 Availability**: AI agents work around the clock
-
-### For Engineering Organizations  
-- **Improved Productivity**: Less time firefighting, more time building features
-- **Better Reliability**: Proactive issue identification and prevention
-- **Cost Reduction**: Lower operational overhead and faster incident response
-- **Enhanced Learning**: Continuous improvement from incident patterns
-
-### For Technical Leaders
-- **Data-Driven Insights**: Comprehensive incident analytics and trends
-- **Scalable Solution**: Grows with your infrastructure complexity
-- **Team Empowerment**: Junior engineers can investigate like seniors
-- **ROI Tracking**: Measurable improvements in incident response metrics
-
----
-
-## 📈 Roadmap & Future Enhancements
-
-### Upcoming Features
-- 🔄 **Auto-Remediation**: Automated fixes for common incident patterns
-- 🔍 **Predictive Analytics**: Detect potential issues before they become incidents  
-- 🌐 **Multi-Platform Support**: Integration with Prometheus, Grafana, Jaeger, Datadog
-- 💬 **Natural Language Interface**: Chat-based incident investigation
-- 🔐 **Enterprise Security**: RBAC, SSO, audit logging
-- 📱 **Mobile Application**: Investigation management on mobile devices
-
-### Integration Roadmap
-- **Slack/Teams Bots**: Incident notifications and updates
-- **PagerDuty/Opsgenie**: Alert management integration  
-- **Jira/ServiceNow**: Automatic ticket creation and updates
-- **GitHub/GitLab**: Link incidents to code deployments
-- **Kubernetes**: Native container orchestration insights
 
 ---
 
 ## 📄 License & Acknowledgments
 
-### License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE).
 
-### Built with Amazing Open Source Tools
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework for building APIs
-- [React](https://reactjs.org/) - JavaScript library for building user interfaces  
-- [LangChain](https://langchain.com/) - Framework for developing AI applications
-- [LangGraph](https://langchain.com/langgraph) - Multi-agent workflow orchestration
-- [SigNoz](https://signoz.io/) - Open-source observability platform
-- [AWS](https://aws.amazon.com/) - Serverless cloud infrastructure (Lambda, API Gateway, DynamoDB, S3, Amplify)
-- [OpenTelemetry](https://opentelemetry.io/) - Observability framework and toolkit
-
-### Community & Support
-- **GitHub Repository**: Star ⭐ and watch for updates
-- **Issue Tracking**: Report bugs and request features via GitHub Issues
-- **Discussions**: Join community discussions for questions and ideas
-- **Documentation**: Comprehensive guides and API documentation
-
----
-
-**🚀 Transform your incident response from reactive firefighting to intelligent, proactive investigation with TattvaAI.**
-
-*Ready to reduce your MTTR by 90% and empower your team with AI-driven insights? Get started today!*
+Built with pride using open-source technologies:
+- [FastAPI](https://fastapi.tiangolo.com/) & [Uvicorn](https://www.uvicorn.org/)
+- [React](https://react.dev/) & [Vite](https://vitejs.dev/)
+- [PrimeReact](https://primereact.org/) & [React Flow](https://reactflow.dev/)
+- [OpenTelemetry](https://opentelemetry.io/) & [SigNoz](https://signoz.io/)
+- [Amazon Web Services](https://aws.amazon.com/) (Lambda, API Gateway, DynamoDB, S3, Bedrock, Amplify)

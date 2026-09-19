@@ -11,6 +11,7 @@ import "./styles/index.css";
 import "./api/interceptors.js";
 
 import App from "./App.jsx";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { primeReactConfig } from "./config/primeReactConfig.js";
 
 // Create QueryClient instance for TanStack Query
@@ -34,7 +35,9 @@ createRoot(document.getElementById("root")).render(
         <QueryClientProvider client={queryClient}>
             <PrimeReactProvider value={primeReactConfig}>
                 <BrowserRouter>
-                    <App />
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
                 </BrowserRouter>
             </PrimeReactProvider>
         </QueryClientProvider>

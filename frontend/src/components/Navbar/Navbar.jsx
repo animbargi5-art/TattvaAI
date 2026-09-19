@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menubar } from "primereact/menubar";
 import { Badge } from "primereact/badge";
 import { Avatar } from "primereact/avatar";
@@ -8,6 +8,7 @@ import { Menu } from "primereact/menu";
 import { Chip } from "primereact/chip";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Divider } from "primereact/divider";
+import { useAuth } from "../../contexts/AuthContext";
 import dashboardService from "../../services/dashboardService";
 import telemetryService from "../../services/telemetryService";
 
@@ -15,6 +16,8 @@ import "../../styles/layouts/navbar.css";
 
 export default function Navbar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
     const [backendStatus, setBackendStatus] = useState('connected');
     const [telemetryInfo, setTelemetryInfo] = useState({
         name: 'AWS Observability',
@@ -54,32 +57,36 @@ export default function Navbar() {
     const breadcrumbItems = getBreadcrumbItems();
     const breadcrumbHome = { icon: 'pi pi-home', url: '/dashboard' };
 
-    // User menu items
+    // User menu items reflecting authentication state
     const userMenuItems = [
         {
-            label: 'Profile',
-            icon: 'pi pi-user',
-            command: () => {
-                // Navigate to profile (future feature)
-            }
-        },
-        {
-            label: 'Settings',
-            icon: 'pi pi-cog',
-            command: () => {
-                // Navigate to settings
-                window.location.href = '/settings';
-            }
-        },
-        {
-            separator: true
-        },
-        {
-            label: 'Logout',
-            icon: 'pi pi-sign-out',
-            command: () => {
-                // Handle logout (future feature)
-            }
+            label: user?.full_name || 'Engineer Profile',
+            items: [
+                {
+                    label: user?.email || 'Authenticated User',
+                    icon: 'pi pi-id-card',
+                    disabled: true,
+                },
+                {
+                    label: 'Platform Settings',
+                    icon: 'pi pi-cog',
+                    command: () => {
+                        navigate('/settings');
+                    }
+                },
+                {
+                    separator: true
+                },
+                {
+                    label: 'Logout',
+                    icon: 'pi pi-sign-out',
+                    className: 'text-red-500',
+                    command: () => {
+                        logout();
+                        navigate('/login');
+                    }
+                }
+            ]
         }
     ];
 
@@ -215,16 +222,23 @@ export default function Navbar() {
 
             {/* User Menu */}
             <Button
-                className="p-button-text user-button"
+                className="p-button-text user-button p-0"
                 onClick={(e) => userMenuRef.current.toggle(e)}
-                tooltip="User Menu"
+                tooltip={user ? `${user.full_name} (${user.email})` : "User Profile"}
                 tooltipOptions={{ position: 'bottom' }}
             >
-                <Avatar 
-                    icon="pi pi-user" 
-                    shape="circle" 
-                    className="user-avatar"
-                />
+                <div className="flex align-items-center gap-2 px-2 py-1 border-round hover:surface-100 transition-colors">
+                    <Avatar 
+                        label={user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : "U")} 
+                        shape="circle" 
+                        className="user-avatar text-xs font-bold"
+                        style={{ backgroundColor: 'var(--primary-color)', color: '#ffffff', width: '28px', height: '28px' }}
+                    />
+                    <span className="text-xs font-semibold text-color hidden md:inline">
+                        {user?.full_name ? user.full_name.split(' ')[0] : 'Engineer'}
+                    </span>
+                    <i className="pi pi-angle-down text-xs text-color-secondary"></i>
+                </div>
             </Button>
         </div>
     );

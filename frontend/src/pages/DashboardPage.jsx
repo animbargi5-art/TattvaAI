@@ -360,7 +360,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Investigation Control Block */}
-            <Card className="investigation-control-block mb-4 border-2 border-primary-200" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+            <Card className="investigation-control-block mb-4" style={{background: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)', border: '1px solid #0284c7'}}>
                 <div className="text-white">
                     <div className="flex flex-column md:flex-row md:align-items-center justify-content-between gap-3">
                         <div>
@@ -373,7 +373,7 @@ export default function DashboardPage() {
                             </p>
                             <div className="flex align-items-center mt-2 text-sm text-200">
                                 <i className="pi pi-clock mr-1"></i>
-                                <span>Multi-agent correlation & Bedrock reasoning · Real-time human review</span>
+                                <span>Multi-agent correlation &amp; AI reasoning &middot; Real-time human review</span>
                             </div>
                         </div>
                         <div className="text-center md:text-right">
@@ -384,7 +384,7 @@ export default function DashboardPage() {
                                 disabled={isInvestigationRunning || investigationStatus?.status === 'running'}
                                 loading={startInvestigationMutation.isPending}
                                 className="p-button-success p-button-lg shadow-2"
-                                style={{minWidth: '220px'}}
+                                style={{minWidth: '220px', background: '#22c55e', borderColor: '#22c55e', color: '#fff'}}
                             />
                             {investigationStatus?.status === 'running' && (
                                 <div className="mt-2 text-100 text-sm">

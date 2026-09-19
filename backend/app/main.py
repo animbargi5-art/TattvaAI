@@ -9,6 +9,7 @@ from app.api.demo import router as demo_router
 from app.api.dashboard import router as dashboard_router
 from app.api.signoz import router as signoz_router
 from app.api.telemetry import router as telemetry_router
+from app.api.auth import router as auth_router
 
 from app.telemetry.tracing import setup_tracing
 from app.core.settings import settings
@@ -22,9 +23,11 @@ app = FastAPI(
 cors_origins = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://localhost:3002",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
     "http://127.0.0.1:5173",
 ]
 if settings.FRONTEND_ORIGIN and settings.FRONTEND_ORIGIN not in cors_origins:
@@ -40,6 +43,7 @@ app.add_middleware(
 
 app.include_router(root_router)
 app.include_router(health_router)
+app.include_router(auth_router)
 app.include_router(investigation_router)
 app.include_router(investigations_plural_router)
 app.include_router(demo_router)

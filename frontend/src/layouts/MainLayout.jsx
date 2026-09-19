@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { setToastRef } from "../api/interceptors.js";
@@ -24,7 +25,7 @@ export default function MainLayout({ children }) {
                 <Navbar />
                 
                 <main className="main-content">
-                    {children}
+                    {children || <Outlet />}
                 </main>
             </div>
 

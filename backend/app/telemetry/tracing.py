@@ -160,7 +160,7 @@ def setup_tracing(app):
             logger_provider
         )
 
-        print("✅ OpenTelemetry initialized in PRODUCTION MODE")
+        print("[OK] OpenTelemetry initialized in PRODUCTION MODE")
 
     # -----------------------------
     # Common Instrumentation

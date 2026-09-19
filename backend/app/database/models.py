@@ -3,6 +3,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
 from sqlalchemy import JSON
+from sqlalchemy import Boolean
 
 from sqlalchemy.orm import declarative_base
 
@@ -123,3 +124,46 @@ class ReviewRecord(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+
+class User(Base):
+    """
+    User model representing registered SRE engineers and investigators.
+    """
+
+    __tablename__ = "users"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    email = Column(
+        String,
+        unique=True,
+        index=True,
+        nullable=False
+    )
+
+    full_name = Column(
+        String,
+        nullable=False
+    )
+
+    hashed_password = Column(
+        String,
+        nullable=False
+    )
+
+    is_active = Column(
+        Boolean,
+        default=True,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
