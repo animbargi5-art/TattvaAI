@@ -87,7 +87,11 @@ export default function Navbar() {
             </div>
 
             {/* Notifications Overlay Panel */}
-            <OverlayPanel ref={notificationsRef} style={{ width: "320px" }}>
+            <OverlayPanel 
+                ref={notificationsRef} 
+                style={{ width: "320px" }}
+                appendTo={typeof document !== "undefined" ? document.body : null}
+            >
                 <div style={{ padding: "0.5rem" }}>
                     <div className="flex align-items-center justify-content-between mb-2">
                         <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)" }}>Notifications</span>
@@ -113,9 +117,11 @@ export default function Navbar() {
 
             {/* User Dropdown Menu */}
             <Menu 
+                id="user-profile-menu"
                 model={userMenuItems} 
                 popup 
                 ref={userMenuRef} 
+                appendTo={typeof document !== "undefined" ? document.body : null}
             />
         </header>
     );

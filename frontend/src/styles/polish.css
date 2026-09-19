@@ -559,6 +559,57 @@ body {
   color: var(--text-primary);
 }
 
+/* User Profile Dropdown Menu */
+.p-menu.p-menu-overlay {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-color, #D1E9F5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+  padding: 0.35rem 0 !important;
+  min-width: 210px !important;
+  z-index: 1100 !important;
+}
+
+.p-menu .p-submenu-header {
+  background: #F8FAFC !important;
+  color: var(--text-secondary, #4E6979) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 0.5rem 0.875rem !important;
+  border-bottom: 1px solid var(--border-subtle, #E2F1F8) !important;
+}
+
+.p-menu .p-menuitem-link {
+  padding: 0.5rem 0.875rem !important;
+  color: var(--text-primary, #163341) !important;
+  font-size: 0.8125rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: background 0.15s ease !important;
+}
+
+.p-menu .p-menuitem-link:hover {
+  background: var(--hover-bg, #F0F9FF) !important;
+  color: var(--primary-color, #0EA5E9) !important;
+}
+
+.p-menu .p-menuitem-link .p-menuitem-icon {
+  color: var(--text-secondary, #4E6979) !important;
+  font-size: 0.875rem !important;
+}
+
+.p-menu .p-menuitem-link:hover .p-menuitem-icon {
+  color: var(--primary-color, #0EA5E9) !important;
+}
+
+.p-menu .p-menuitem-separator {
+  border-top: 1px solid var(--border-subtle, #E2F1F8) !important;
+  margin: 0.25rem 0 !important;
+}
+
 /* Sidebar Specifics */
 .sidebar-clean {
   width: var(--sidebar-width);
