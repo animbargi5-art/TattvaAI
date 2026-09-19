@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -34,6 +34,10 @@ class InvestigationState(BaseModel):
     service_name: str
 
     incident: dict[str, Any] = Field(default_factory=dict)
+
+    telemetry_source: Optional[str] = None
+    telemetry_mode: Optional[str] = None
+    environment: str = "production"
 
     # -------------------------------------------------
     # Raw Telemetry
@@ -87,6 +91,8 @@ class InvestigationState(BaseModel):
     completed_agents: list[str] = Field(default_factory=list)
 
     failed_agents: list[str] = Field(default_factory=list)
+
+    pipeline_execution: list[dict[str, Any]] = Field(default_factory=list)
 
     # -------------------------------------------------
     # Report & Review

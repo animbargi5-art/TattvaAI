@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PricingPage() {
@@ -72,12 +72,12 @@ export default function PricingPage() {
             <span style={styles.period}>/month</span>
           </div>
           <ul style={styles.list}>
-            <li>âœ” Unlimited AI Investigations</li>
-            <li>âœ” Multi-Service Dependency Graphs</li>
-            <li>âœ” Google Gemini 2.5 Pro Engine</li>
-            <li>âœ” Live SigNoz MCP Gateway Integration</li>
-            <li>âœ” Real-Time Evidence Mapping</li>
-            <li>âœ” Email & Slack Alert Integration</li>
+            <li>✔ Unlimited AI Investigations</li>
+            <li>✔ Multi-Service Dependency Graphs</li>
+            <li>✔ Amazon Bedrock AI Reasoning</li>
+            <li>✔ Live Multi-Provider Observability (AWS, SigNoz, OTel)</li>
+            <li>✔ Real-Time Evidence Mapping</li>
+            <li>✔ Human Review Audit Persistence</li>
           </ul>
           <button style={styles.buttonPrimary} onClick={() => handleSubscribe("Pro SRE Team")}>
             Upgrade to Pro

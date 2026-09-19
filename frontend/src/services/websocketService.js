@@ -4,7 +4,9 @@ class WebSocketService {
         this.reconnectAttempts = new Map();
         this.maxReconnectAttempts = 5;
         this.reconnectDelay = 1000; // Start with 1 second delay
-        this.wsBaseUrl = import.meta.env.VITE_WS_BASE_URL || 'ws://127.0.0.1:8000/ws';
+        const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
+        const defaultWsBase = apiBase.replace(/^http(s)?:\/\//, (match, s) => s ? 'wss://' : 'ws://') + '/ws';
+        this.wsBaseUrl = import.meta.env.VITE_WS_BASE_URL || defaultWsBase;
     }
 
     // Connect to investigation progress WebSocket

@@ -10,19 +10,23 @@ Prerequisites
 Before starting, ensure you have the following installed:
 
 Required Software:
-- Docker Desktop (latest version)
+- Python 3.12+ (for FastAPI backend)
+- Node.js 20+ & npm (for React/Vite frontend)
 - Git (for cloning the repository)
 - Web Browser (Chrome, Firefox, Safari, Edge)
 
 System Requirements:
-- RAM: Minimum 8GB (16GB recommended)
-- Storage: 5GB free space
-- OS: Windows 10/11, macOS 10.15+, or Linux Ubuntu 18.04+
+- RAM: Minimum 4GB (8GB recommended)
+- Storage: 1GB free space
+- OS: Windows 10/11, macOS 10.15+, or Linux Ubuntu 20.04+
 
 Verify Installation:
-# Check Docker
-docker --version
-docker-compose --version
+# Check Python
+python --version
+
+# Check Node.js
+node --version
+npm --version
 
 # Check Git
 git --version
@@ -36,22 +40,30 @@ git clone https://github.com/animbargi5-art/AI-Observability-Agent-.git TattvaAI
 cd TattvaAI
 
 Step 2: Start TattvaAI
-docker-compose up --build -d
 
-Expected time: 2-3 minutes for initial build
+Backend (Terminal 1):
+cd backend
+python -m venv .venv
+# Windows: .venv\Scripts\activate | Unix: source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+Frontend (Terminal 2):
+cd frontend
+npm install
+npm run dev
 
 Step 3: Verify Services
-# Check all services are running
-docker-compose ps
-
 # Test backend health
 curl http://localhost:8000/health
+# Expected: {"status":"healthy"}
 
 Step 4: Access TattvaAI
 Open your browser and navigate to:
-- TattvaAI Dashboard: http://localhost:3001
+- TattvaAI Dashboard: http://localhost:5173
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
+- Live AWS Production API: https://eodackuif2.execute-api.us-east-1.amazonaws.com
 
 
 Demo Walkthrough
@@ -152,28 +164,23 @@ curl http://localhost:8000/dashboard/statistics
 # Get recent investigations
 curl http://localhost:8000/dashboard/recent
 
-Microservices Architecture
-View running services:
-docker-compose ps
-
-Expected Services:
-- tattvaai-backend (port 8000) - Main AI engine
-- tattvaai-frontend (port 3001) - React dashboard
+Microservices Architecture & Services:
+- tattvaai-backend (port 8000 / AWS Lambda) - Main AI engine
+- tattvaai-frontend (port 5173 / AWS Amplify) - PrimeReact dashboard
 - gateway (port 8011) - API gateway service
 - inventory (port 8002) - Inventory microservice  
 - payment (port 8004) - Payment processing service
 - order (port 8003) - Order management service
 
-Log Monitoring
-View real-time logs:
-# All services
-docker-compose logs -f
+Log Monitoring:
+View real-time logs directly in the backend terminal or AWS CloudWatch:
+# Backend terminal shows live agent execution:
+# [IncidentCoordinator] Starting investigation...
+# [TraceAgent] Retrieving traces from telemetry source...
+# [BedrockReasoning] Reasoning completed with Claude 3.7 Sonnet
 
-# Specific service
-docker-compose logs -f backend
-
-# Investigation coordinator
-docker-compose logs -f backend | grep "IncidentCoordinator"
+# AWS CloudWatch (for deployed Lambda):
+# AWS Console -> CloudWatch -> Log groups -> /aws/lambda/TattvaAI-Backend
 
 
 User Interface Highlights
@@ -231,17 +238,18 @@ Troubleshooting
 Common Issues:
 
 Services Not Starting:
-# Check Docker daemon
-docker info
+# Check Python environment and dependencies
+cd backend
+python -c "import fastapi, uvicorn; print('Backend environment OK')"
 
-# Rebuild containers
-docker-compose down
-docker-compose up --build
+# Check Frontend node modules
+cd frontend
+npm run build
 
 Port Conflicts:
 # Check port usage
 netstat -an | grep :8000
-netstat -an | grep :3001
+netstat -an | grep :5173
 
 # Stop conflicting services or change ports
 
@@ -250,13 +258,6 @@ Browser Issues:
 # Try incognito/private mode
 # Check browser console for errors (F12)
 
-Performance Issues:
-# Check available resources
-docker stats
-
-# Increase Docker memory allocation
-# Close unnecessary applications
-
 Health Checks:
 Verify all services:
 # Backend health
@@ -264,7 +265,7 @@ curl http://localhost:8000/health
 # Expected: {"status":"healthy"}
 
 # Frontend accessibility  
-curl http://localhost:3001
+curl http://localhost:5173
 # Expected: HTML response
 
 # API documentation
@@ -273,14 +274,9 @@ curl http://localhost:8000/docs
 
 Log Analysis:
 Check specific issues:
-# Backend errors
-docker-compose logs backend | grep -i error
-
-# Frontend build issues
-docker-compose logs frontend | grep -i error
-
-# Database connection
-docker-compose logs backend | grep -i database
+# Review backend terminal stdout/stderr
+# Review browser DevTools console (F12)
+# For AWS deployment, check CloudWatch Log Group: /aws/lambda/TattvaAI-Backend
 
 
 Demo Tips & Best Practices
@@ -341,19 +337,13 @@ Cleanup
 =======
 
 Stop All Services:
-# Graceful shutdown
-docker-compose down
-
-# Remove containers and volumes
-docker-compose down -v
-
-# Clean up images (optional)
-docker system prune -a
+# In the respective terminals:
+Press Ctrl+C to terminate the FastAPI backend (uvicorn)
+Press Ctrl+C to terminate the Vite frontend dev server
 
 Resource Usage:
-- Disk Space: ~2GB containers + 500MB images
-- Memory Usage: ~4GB while running
-- Network: Bridge network tattvaai_tattvaai-network
+- Minimal local CPU and memory overhead (<300MB RAM)
+- Fully serverless in AWS (Lambda + Amplify) with zero idle cost
 
 
 Support & Resources

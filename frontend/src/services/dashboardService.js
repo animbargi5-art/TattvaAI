@@ -3,12 +3,25 @@ import api from "../api/interceptors.js";
 class DashboardService {
     constructor() {
         this.baseEndpoint = "/dashboard";
+        // Auto-bind all methods so they can be safely passed to React Query (queryFn, etc.)
+        const proto = Object.getPrototypeOf(this);
+        Object.getOwnPropertyNames(proto)
+            .filter(prop => typeof this[prop] === 'function' && prop !== 'constructor')
+            .forEach(method => {
+                this[method] = this[method].bind(this);
+            });
     }
 
     // Get dashboard statistics
     async getDashboardStats() {
-        const response = await api.get(`${this.baseEndpoint}/statistics`);
+        const base = this?.baseEndpoint || "/dashboard";
+        const response = await api.get(`${base}/statistics`);
         return response.data;
+    }
+
+    // Alias for getDashboardStats
+    async getDashboardStatistics() {
+        return this.getDashboardStats();
     }
 
     // Get investigation status
@@ -18,9 +31,19 @@ class DashboardService {
         return { status: 'idle' };
     }
 
-    // Get recent investigations
-    async getRecentInvestigations(limit = 5) {
-        const response = await api.get(`${this.baseEndpoint}/recent`, {
+    // Alias for active investigations
+    async getActiveInvestigations() {
+        return [];
+    }
+
+    // Get recent investigations (accepts number or object with limit)
+    async getRecentInvestigations(paramsOrLimit = 5) {
+        const base = this?.baseEndpoint || "/dashboard";
+        const limit = typeof paramsOrLimit === 'object' && paramsOrLimit !== null
+            ? (paramsOrLimit.limit ?? 5)
+            : paramsOrLimit;
+
+        const response = await api.get(`${base}/recent`, {
             params: { limit }
         });
         return response.data.investigations ?? [];
@@ -28,8 +51,14 @@ class DashboardService {
 
     // Get system health
     async getSystemHealth() {
-        const response = await api.get(`${this.baseEndpoint}/health-overview`);
+        const base = this?.baseEndpoint || "/dashboard";
+        const response = await api.get(`${base}/health-overview`);
         return response.data;
+    }
+
+    // Alias for system health
+    async getSystemStatus() {
+        return this.getSystemHealth();
     }
 
     // Get backend connection status
@@ -40,9 +69,11 @@ class DashboardService {
 
     // Get SigNoz connection status
     async getSigNozStatus() {
-        const response = await api.get(`${this.baseEndpoint}/signoz-status`);
+        const base = this?.baseEndpoint || "/dashboard";
+        const response = await api.get(`${base}/signoz-status`);
         return response.data;
     }
 }
 
-export default new DashboardService();
+export const dashboardService = new DashboardService();
+export default dashboardService;

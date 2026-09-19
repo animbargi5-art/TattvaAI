@@ -172,6 +172,10 @@ class InvestigationReport(BaseModel):
         default_factory=dict
     )
 
+    pipeline_execution: list[dict] = Field(
+        default_factory=list
+    )
+
     # -------------------------------------------------------------------------
     # Timestamps
     # -------------------------------------------------------------------------

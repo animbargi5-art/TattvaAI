@@ -6,60 +6,45 @@ import { Badge } from "primereact/badge";
 import { Skeleton } from "primereact/skeleton";
 
 const investigationSteps = [
-    { 
-        label: "Starting Investigation", 
-        icon: "pi pi-play", 
-        description: "Initializing AI investigation workflow"
+    {
+        label: "Trace Agent",
+        icon: "pi pi-search",
+        description: "Distributed spans & latency anomalies"
     },
-    { 
-        label: "Trace Agent", 
-        icon: "pi pi-search", 
-        description: "Analyzing distributed traces"
+    {
+        label: "Logs Agent",
+        icon: "pi pi-file-o",
+        description: "Structured errors & stack traces"
     },
-    { 
-        label: "Logs Agent", 
-        icon: "pi pi-file-o", 
-        description: "Processing application logs"
+    {
+        label: "Metrics Agent",
+        icon: "pi pi-chart-line",
+        description: "Evaluating metrics anomalies"
     },
-    { 
-        label: "Metrics Agent", 
-        icon: "pi pi-chart-line", 
-        description: "Evaluating system metrics"
+    {
+        label: "Dependency Agent",
+        icon: "pi pi-sitemap",
+        description: "Mapping service topology & blast radius"
     },
-    { 
-        label: "Alert Agent", 
-        icon: "pi pi-bell", 
-        description: "Correlating alerts"
+    {
+        label: "Alert Agent",
+        icon: "pi pi-bell",
+        description: "Correlating active alerts & SLOs"
     },
-    { 
-        label: "Dependency Agent", 
-        icon: "pi pi-sitemap", 
-        description: "Mapping service dependencies"
+    {
+        label: "Historical Agent",
+        icon: "pi pi-history",
+        description: "Recalling past incident patterns"
     },
-    { 
-        label: "Historical Agent", 
-        icon: "pi pi-history", 
-        description: "Comparing with past incidents"
+    {
+        label: "Evidence Correlation",
+        icon: "pi pi-sliders-h",
+        description: "Cross-signal temporal correlation"
     },
-    { 
-        label: "Correlation Engine", 
-        icon: "pi pi-link", 
-        description: "Connecting evidence patterns"
-    },
-    { 
-        label: "Root Cause Analysis", 
-        icon: "pi pi-exclamation-triangle", 
-        description: "Identifying primary causes"
-    },
-    { 
-        label: "Recommendation Engine", 
-        icon: "pi pi-lightbulb", 
-        description: "Generating solutions"
-    },
-    { 
-        label: "Report Generation", 
-        icon: "pi pi-file", 
-        description: "Creating final report"
+    {
+        label: "AI Reasoning",
+        icon: "pi pi-bolt",
+        description: "Amazon Bedrock AI reasoning"
     }
 ];
 
@@ -101,7 +86,7 @@ export default function InvestigationProgress({ status, running }) {
                 <span className="font-semibold">AI Investigation Progress</span>
             </div>
             {running && (
-                <Badge 
+                <Badge
                     value={`${currentStep}/${investigationSteps.length}`}
                     severity="info"
                 />
@@ -111,7 +96,7 @@ export default function InvestigationProgress({ status, running }) {
 
     const timelineItemTemplate = (item) => (
         <div className="flex align-items-center gap-3">
-            <div className="flex align-items-center justify-content-center bg-primary border-circle" 
+            <div className="flex align-items-center justify-content-center bg-primary border-circle"
                  style={{ minWidth: '2rem', height: '2rem' }}>
                 <i className={`${item.icon} text-white`} style={{ fontSize: '0.875rem' }}></i>
             </div>
@@ -152,7 +137,7 @@ export default function InvestigationProgress({ status, running }) {
                         <span className="text-sm text-600">Overall Progress</span>
                         <span className="text-sm font-semibold">{progressPercentage}%</span>
                     </div>
-                    <ProgressBar 
+                    <ProgressBar
                         value={progressPercentage}
                         className="h-1rem"
                         color={progressPercentage === 100 ? '#22c55e' : undefined}
@@ -161,7 +146,7 @@ export default function InvestigationProgress({ status, running }) {
             )}
 
             {visibleSteps.length > 0 && (
-                <Timeline 
+                <Timeline
                     value={visibleSteps}
                     content={timelineItemTemplate}
                     className="investigation-timeline"

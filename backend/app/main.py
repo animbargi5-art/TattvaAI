@@ -8,6 +8,7 @@ from app.api.investigation import router as investigation_router, plural_router 
 from app.api.demo import router as demo_router
 from app.api.dashboard import router as dashboard_router
 from app.api.signoz import router as signoz_router
+from app.api.telemetry import router as telemetry_router
 
 from app.telemetry.tracing import setup_tracing
 from app.core.settings import settings
@@ -44,5 +45,6 @@ app.include_router(investigations_plural_router)
 app.include_router(demo_router)
 app.include_router(dashboard_router)
 app.include_router(signoz_router)
+app.include_router(telemetry_router)
 
 setup_tracing(app)

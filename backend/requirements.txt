@@ -69,3 +69,4 @@ SQLAlchemy==2.0.41
 mcp==1.28.1
 boto3
 mangum==0.22.0
+reportlab>=4.0.0

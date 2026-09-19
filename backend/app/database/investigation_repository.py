@@ -147,6 +147,10 @@ class DynamoDBInvestigationRepository(BaseInvestigationRepository):
         report: InvestigationReport | Dict[str, Any],
     ) -> Dict[str, Any]:
         data = report.model_dump(mode="json") if hasattr(report, "model_dump") else dict(report)
+        logger.info(
+            "[InvestigationRepository] DynamoDBInvestigationRepository delegating save to DynamoDBService (table: '%s')",
+            self.service.table_name,
+        )
         return self.service.save_investigation(data)
 
     def get_all_investigations(self) -> List[Dict[str, Any]]:

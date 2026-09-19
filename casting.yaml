@@ -87,8 +87,8 @@ spec:
       
   # Deployment Configuration  
   deployment:
-    mode: docker-compose
-    environment: development
+    mode: aws-serverless
+    environment: production
     demo_mode: true
     
     networks:

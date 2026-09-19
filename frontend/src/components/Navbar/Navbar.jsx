@@ -6,17 +6,21 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Chip } from "primereact/chip";
-// import { Breadcrumb } from "primereact/breadcrumb"; // Temporarily removed due to import issues
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Divider } from "primereact/divider";
 import dashboardService from "../../services/dashboardService";
+import telemetryService from "../../services/telemetryService";
 
 import "../../styles/layouts/navbar.css";
 
 export default function Navbar() {
     const location = useLocation();
     const [backendStatus, setBackendStatus] = useState('connected');
-    const [signozStatus, setSignozStatus] = useState('connected');
+    const [telemetryInfo, setTelemetryInfo] = useState({
+        name: 'AWS Observability',
+        status: 'connected',
+        mode: 'LIVE'
+    });
     const [currentInvestigation, setCurrentInvestigation] = useState(null);
     const [notifications] = useState([
         { id: 1, type: 'info', message: 'Investigation #INV-001 completed', timestamp: '2 min ago' },
@@ -89,11 +93,25 @@ export default function Navbar() {
                 setBackendStatus('disconnected');
             }
 
+            const activeProv = telemetryService.getActiveProvider() || 'aws';
             try {
-                await dashboardService.getSigNozStatus();
-                setSignozStatus('connected');
+                const res = await telemetryService.testProviderConnection({ provider: activeProv });
+                const nameMap = {
+                    aws: 'AWS Observability',
+                    signoz: 'SigNoz',
+                    opentelemetry: 'OpenTelemetry',
+                    mock: 'Mock / Demo'
+                };
+                setTelemetryInfo({
+                    name: nameMap[activeProv] || activeProv.toUpperCase(),
+                    status: res.connected ? 'connected' : 'disconnected',
+                    mode: res.mode || (activeProv === 'mock' ? 'DEMO' : 'LIVE')
+                });
             } catch (error) {
-                setSignozStatus('disconnected');
+                setTelemetryInfo(prev => ({
+                    ...prev,
+                    status: 'disconnected'
+                }));
             }
         };
 
@@ -101,8 +119,13 @@ export default function Navbar() {
         
         // Set up periodic status checks
         const statusInterval = setInterval(checkSystemStatus, 30000); // Check every 30 seconds
+        const handleProviderChange = () => checkSystemStatus();
+        window.addEventListener('tattvaai:provider-changed', handleProviderChange);
         
-        return () => clearInterval(statusInterval);
+        return () => {
+            clearInterval(statusInterval);
+            window.removeEventListener('tattvaai:provider-changed', handleProviderChange);
+        };
     }, []);
 
     const getStatusIcon = (status) => {
@@ -246,11 +269,11 @@ export default function Navbar() {
                     <div className="status-items">
                         <div className="status-item">
                             <i className={getStatusIcon(backendStatus)}></i>
-                            <span>{getStatusText('Backend', backendStatus)}</span>
+                            <span>{getStatusText('Backend API', backendStatus)}</span>
                         </div>
                         <div className="status-item">
-                            <i className={getStatusIcon(signozStatus)}></i>
-                            <span>{getStatusText('SigNoz', signozStatus)}</span>
+                            <i className={getStatusIcon(telemetryInfo.status)}></i>
+                            <span>{getStatusText(telemetryInfo.name, telemetryInfo.status)}</span>
                         </div>
                     </div>
                     <Divider />

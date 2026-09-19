@@ -11,7 +11,7 @@ import "reactflow/dist/style.css";
 import "../../styles/investigation-graph.css";
 
 export default function InvestigationGraph({ investigation }) {
-    const graph = investigation?.report?.graph;
+    const graph = investigation?.report?.graph || investigation?.final_report?.graph || investigation?.graph || investigation?.reasoning?.graph;
 
     const nodes = useMemo(() => {
 

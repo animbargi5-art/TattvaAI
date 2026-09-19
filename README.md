@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
+![AWS](https://img.shields.io/badge/AWS-Serverless-FF9900?style=for-the-badge&logo=amazon-aws)
 ![SigNoz](https://img.shields.io/badge/SigNoz-Integrated-FF6B35?style=for-the-badge)
 
 ---
@@ -58,39 +58,48 @@ Builds knowledge from past incidents to improve accuracy and speed over time
 Modern React-based UI with real-time investigation tracking and comprehensive reporting
 
 🔧 **Production-Ready Architecture**  
-Containerized microservices with health monitoring, logging, and scalable deployment
+Serverless architecture on AWS Lambda, API Gateway, DynamoDB, S3, and AWS Amplify with end-to-end observability and resilience
 
 ---
 
 ## 🚀 Quick Start
 
-### One-Command Setup
+### Local Development Setup
+
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/animbargi5-art/AI-Observability-Agent-.git TattvaAI
 cd TattvaAI
 
-# Start all services (includes demo microservices)
-docker-compose up --build -d
+# 2. Start Backend (FastAPI)
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Takes 2-3 minutes for initial build
+# 3. Start Frontend (React + Vite, in a new terminal)
+cd ../frontend
+npm install
+npm run dev
 ```
 
 ### Access Your TattvaAI Instance
-- **🎨 Main Dashboard**: http://localhost:3001
-- **🔧 Backend API**: http://localhost:8000  
+- **🎨 Main Dashboard**: http://localhost:5173 (or http://localhost:3001)
+- **🔧 Backend API**: http://localhost:8000
 - **📚 API Documentation**: http://localhost:8000/docs
 - **❤️ Health Check**: http://localhost:8000/health
 
-### Verify Everything is Running
-```bash
-# Check all services status
-docker-compose ps
+### Live AWS Serverless Deployment
+TattvaAI is deployed natively on AWS serverless infrastructure:
+- **Frontend**: AWS Amplify (React 19 + Vite + PrimeReact)
+- **Backend**: AWS Lambda (`TattvaAI-Backend`) via API Gateway
+- **API Gateway Endpoint**: `https://eodackuif2.execute-api.us-east-1.amazonaws.com`
+- **Reasoning**: Amazon Bedrock (`Claude 3.7 Sonnet`)
+- **Persistence**: DynamoDB (`tattvaai_investigations`) & S3 (`tattvaai-investigation-reports`)
+- **Telemetry**: AWS Observability (CloudWatch / X-Ray) & SigNoz OTLP
 
-# Test backend connectivity
-curl http://localhost:8000/health
-# Expected: {"status":"healthy"}
-```
+For full deployment instructions, see [docs/AWS_DEPLOYMENT.md](file:///d:/Projects/TattvaAI/docs/AWS_DEPLOYMENT.md).
 
 ---
 
@@ -176,8 +185,8 @@ Production Incident
 - **⚛️ Frontend**: React 19, TypeScript, Vite, Modern UI Components  
 - **🤖 AI/ML**: Multi-Agent System, Evidence-Based Reasoning, Memory Networks
 - **📊 Observability**: SigNoz Native Integration, OpenTelemetry, MCP Protocol
-- **🐳 Infrastructure**: Docker Compose, Microservices, Health Monitoring
-- **💾 Data**: PostgreSQL, Investigation Memory, Historical Pattern Storage
+- **☁️ Infrastructure**: AWS Lambda, API Gateway, AWS Amplify, DynamoDB, S3, Secrets Manager
+- **💾 Data**: PostgreSQL / DynamoDB, Investigation Memory, Historical Pattern Storage
 
 ### Microservices Demo Environment
 TattvaAI includes a complete e-commerce microservices environment for realistic testing:
@@ -287,8 +296,8 @@ TattvaAI/
 │   ├── order/                 # Order processing service
 │   ├── payment/               # Payment service
 │   └── inventory/             # Inventory management
-├── docker-compose.yml          # 🐳 Container orchestration
-├── casting.yaml               # 📋 SigNoz deployment config
+├── infra/                      # ☁️ AWS IAM & deployment policies
+├── docs/AWS_DEPLOYMENT.md     # 📖 Complete AWS serverless guide
 └── DEMO_GUIDE.txt            # 🎬 Complete demo instructions
 ```
 
@@ -311,7 +320,7 @@ We welcome contributions to TattvaAI! Here's how to get started:
 - Add docstrings to all functions and classes
 - Include unit tests for new features  
 - Update documentation for API changes
-- Ensure Docker builds pass successfully
+- Ensure frontend and backend validation checks pass successfully
 
 ---
 
@@ -367,7 +376,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [LangChain](https://langchain.com/) - Framework for developing AI applications
 - [LangGraph](https://langchain.com/langgraph) - Multi-agent workflow orchestration
 - [SigNoz](https://signoz.io/) - Open-source observability platform
-- [Docker](https://docker.com/) - Containerization and deployment platform
+- [AWS](https://aws.amazon.com/) - Serverless cloud infrastructure (Lambda, API Gateway, DynamoDB, S3, Amplify)
 - [OpenTelemetry](https://opentelemetry.io/) - Observability framework and toolkit
 
 ### Community & Support

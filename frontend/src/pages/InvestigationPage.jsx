@@ -10,6 +10,7 @@ import { confirmDialog } from "primereact/confirmdialog";
 import investigationService from "../services/investigationService";
 
 import InvestigationHeader from "../components/Investigation/InvestigationHeader";
+import InvestigationPipeline from "../components/Investigation/InvestigationPipeline";
 import RootCausePanel from "../components/Investigation/RootCausePanel";
 import EvidencePanel from "../components/Investigation/EvidencePanel";
 import TimelinePanel from "../components/Investigation/TimelinePanel";
@@ -136,7 +137,7 @@ export default function InvestigationPage() {
     }
 
     // Investigation not found
-    if (!investigation) {
+    if (!investigation || investigation.status === 'NOT_FOUND') {
         return (
             <div className="investigation-page">
                 <Card>
@@ -157,10 +158,15 @@ export default function InvestigationPage() {
         );
     }
 
+    const resolvedId = id || investigation.investigation_id || investigation.id || investigation.incident_id;
+
     return (
         <div className="investigation-page">
             {/* Investigation Header */}
             <InvestigationHeader investigation={investigation} />
+
+            {/* Multi-Agent Investigation Pipeline */}
+            <InvestigationPipeline investigation={investigation} />
 
             {/* Executive Summary */}
             <IncidentSummary investigation={investigation} />
@@ -216,6 +222,7 @@ export default function InvestigationPage() {
                 {/* Action Panel */}
                 <div className="col-12">
                     <ActionPanel
+                        investigationId={resolvedId}
                         onRefresh={handleRefresh}
                         onDelete={handleDelete}
                         refreshLoading={refreshInvestigationMutation.isPending}

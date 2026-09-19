@@ -3,12 +3,20 @@ import api from "../api/interceptors.js";
 class HistoryService {
     constructor() {
         this.baseEndpoint = "/investigation";
+        // Auto-bind all methods so they can be safely passed to React Query (queryFn, etc.)
+        const proto = Object.getPrototypeOf(this);
+        Object.getOwnPropertyNames(proto)
+            .filter(prop => typeof this[prop] === 'function' && prop !== 'constructor')
+            .forEach(method => {
+                this[method] = this[method].bind(this);
+            });
     }
 
     // Get all investigations for DataTable  
     async getAllInvestigations(params = {}) {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/history`, { params });
+            const response = await api.get(`${base}/history`, { params });
             return response.data;
         } catch (error) {
             console.error('Error fetching investigations:', error);
@@ -18,8 +26,9 @@ class HistoryService {
 
     // Get investigation by ID
     async getInvestigationById(id) {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/${id}`);
+            const response = await api.get(`${base}/${id}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching investigation ${id}:`, error);
@@ -29,6 +38,7 @@ class HistoryService {
 
     // Search investigations with advanced filters
     async searchInvestigations(searchParams = {}) {
+        const base = this?.baseEndpoint || "/investigation";
         const {
             query = '',
             severity = null,
@@ -66,14 +76,15 @@ class HistoryService {
         params.append('sort_by', sortBy);
         params.append('sort_order', sortOrder);
 
-        const response = await api.get(`${this.baseEndpoint}/search?${params}`);
+        const response = await api.get(`${base}/search?${params}`);
         return response.data;
     }
 
     // Delete investigation
     async deleteInvestigation(id) {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.delete(`${this.baseEndpoint}/${id}`);
+            const response = await api.delete(`${base}/${id}`);
             return response.data;
         } catch (error) {
             console.error(`Error deleting investigation ${id}:`, error);
@@ -83,8 +94,12 @@ class HistoryService {
 
     // Export investigation
     async exportInvestigation(id, format = 'pdf') {
+        if (!id || id === 'undefined' || id === 'null') {
+            throw new Error('Valid investigation ID is required for export');
+        }
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/${id}/export`, {
+            const response = await api.get(`${base}/${id}/export`, {
                 params: { format },
                 responseType: 'blob'
             });
@@ -108,8 +123,9 @@ class HistoryService {
 
     // Get filter options
     async getFilterOptions() {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/filters`);
+            const response = await api.get(`${base}/filters`);
             return response.data;
         } catch (error) {
             console.error('Error fetching filter options:', error);
@@ -119,8 +135,9 @@ class HistoryService {
 
     // Get investigation summary for history view
     async getInvestigationSummary(id) {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/${id}/summary`);
+            const response = await api.get(`${base}/${id}/summary`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching investigation summary ${id}:`, error);
@@ -130,8 +147,9 @@ class HistoryService {
 
     // Bulk operations
     async bulkDeleteInvestigations(ids) {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.delete(`${this.baseEndpoint}/bulk`, {
+            const response = await api.delete(`${base}/bulk`, {
                 data: { investigation_ids: ids }
             });
             return response.data;
@@ -142,8 +160,9 @@ class HistoryService {
     }
 
     async bulkExport(investigationIds, format = 'pdf') {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.post(`${this.baseEndpoint}/bulk-export`, {
+            const response = await api.post(`${base}/bulk-export`, {
                 investigation_ids: investigationIds,
                 format
             }, {
@@ -169,11 +188,12 @@ class HistoryService {
 
     // Export search results
     async exportSearchResults(searchParams, format = 'csv') {
+        const base = this?.baseEndpoint || "/investigation";
         try {
             const params = new URLSearchParams(searchParams);
             params.append('format', format);
 
-            const response = await api.get(`${this.baseEndpoint}/export?${params}`, {
+            const response = await api.get(`${base}/export?${params}`, {
                 responseType: 'blob'
             });
             
@@ -196,8 +216,9 @@ class HistoryService {
 
     // Statistics and analytics
     async getInvestigationStats() {
+        const base = this?.baseEndpoint || "/investigation";
         try {
-            const response = await api.get(`${this.baseEndpoint}/stats`);
+            const response = await api.get(`${base}/stats`);
             return response.data;
         } catch (error) {
             console.error('Error fetching investigation stats:', error);

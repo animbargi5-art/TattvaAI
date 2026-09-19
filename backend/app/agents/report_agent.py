@@ -56,13 +56,15 @@ class ReportAgent(BaseAgent):
             investigation_id=state.incident_id,
             incident_id=state.incident_id,
             service_name=state.service_name,
-            title=state.incident.get(
-                "title",
-                "Unknown Incident"
+            title=(
+                state.incident.get("title")
+                if state.incident.get("title") and state.incident.get("title") != "Unknown Incident"
+                else f"Incident Investigation: {state.service_name.replace('-', ' ').replace('_', ' ').title()} Service"
             ),
-            status=state.incident.get(
-                "status",
-                "UNKNOWN"
+            status=(
+                state.incident.get("status")
+                if state.incident.get("status") and state.incident.get("status") != "UNKNOWN"
+                else "COMPLETED"
             ),
             severity=self.highest_severity(state),
             confidence=state.confidence,
@@ -87,6 +89,7 @@ class ReportAgent(BaseAgent):
             correlation_count=len(state.correlations),
             root_cause_count=len(state.root_causes),
             recommendation_count=len(state.recommendations),
+            pipeline_execution=getattr(state, "pipeline_execution", []) or [],
             generated_at=datetime.utcnow(),
             generated_by="TattvaAI",
         )

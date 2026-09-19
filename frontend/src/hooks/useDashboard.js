@@ -57,7 +57,7 @@ export const useDashboard = (options = {}) => {
         error: statusError
     } = useQuery({
         queryKey: ['system-status'],
-        queryFn: dashboardService.getSystemStatus,
+        queryFn: () => dashboardService.getSystemStatus(),
         staleTime: 30 * 1000, // 30 seconds
         refetchInterval: 10000, // Check every 10 seconds
     });
@@ -68,7 +68,7 @@ export const useDashboard = (options = {}) => {
         isLoading: isActiveLoading
     } = useQuery({
         queryKey: ['active-investigations'],
-        queryFn: dashboardService.getActiveInvestigations,
+        queryFn: () => dashboardService.getActiveInvestigations(),
         staleTime: 15 * 1000, // 15 seconds
         refetchInterval: 5000, // Update every 5 seconds for active investigations
     });

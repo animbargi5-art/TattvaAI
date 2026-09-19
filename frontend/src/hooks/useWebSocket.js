@@ -79,7 +79,9 @@ export const useWebSocket = (url, options = {}) => {
         setError(null);
 
         try {
-            const wsUrl = url.startsWith('ws') ? url : `ws://localhost:8000${url}`;
+            const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/+$/, '');
+            const defaultWsHost = import.meta.env.VITE_WS_BASE_URL || apiBase.replace(/^http(s)?:\/\//, (match, s) => s ? 'wss://' : 'ws://');
+            const wsUrl = url.startsWith('ws') ? url : `${defaultWsHost}${url.startsWith('/') ? '' : '/'}${url}`;
             wsRef.current = new WebSocket(wsUrl, protocols);
 
             wsRef.current.onopen = (event) => {

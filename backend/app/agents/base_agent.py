@@ -45,7 +45,7 @@ from abc import abstractmethod
 from app.core.logger import logger
 from app.schemas.investigation_state import InvestigationState
 from app.models.evidence import Evidence
-
+from app.telemetry.tracing import AgentTracer, create_agent_tracer
 
 
 class BaseAgent(ABC):

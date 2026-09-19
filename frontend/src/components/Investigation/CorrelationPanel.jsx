@@ -6,7 +6,7 @@ export default function CorrelationPanel({ investigation }) {
         return null;
     }
 
-    const correlations = investigation.report?.correlations || [];
+    const correlations = investigation?.report?.correlations || investigation?.final_report?.correlations || investigation?.correlations || [];
 
     return (
 

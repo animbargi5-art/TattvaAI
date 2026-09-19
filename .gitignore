@@ -59,3 +59,11 @@ backend/tattvaai.db
 # Local build and development artifacts
 backend/package/
 scratch/
+
+*.zip
+*.tar.gz
+*.log
+backend/function_backup.zip
+test-investigation.json
+test-investigation.md
+test_results_summary.txt

@@ -29,11 +29,8 @@ export default function InvestigationList({
                     (investigation) => (
 
                         <InvestigationCard
-
-                            key={investigation.id}
-
+                            key={investigation.investigation_id || investigation.id || investigation.incident_id}
                             investigation={investigation}
-
                         />
 
                     )

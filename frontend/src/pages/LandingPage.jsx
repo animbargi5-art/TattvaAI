@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
@@ -24,7 +24,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <header style={styles.hero}>
-        <div style={styles.heroPill}>âœ¨ Powered by Google Gemini & Model Context Protocol</div>
+        <div style={styles.heroPill}>✨ Powered by Amazon Bedrock & Model Context Protocol</div>
         <h1 style={styles.heroTitle}>
           Transform SRE Incident Investigations from <span style={styles.gradientText}>Hours to Seconds</span>
         </h1>
@@ -46,24 +46,24 @@ export default function LandingPage() {
         <h2 style={styles.sectionHeader}>Built for Modern Engineering & SRE Teams</h2>
         <div style={styles.grid}>
           <div style={styles.card}>
-            <div style={styles.cardIcon}>ðŸ”</div>
+            <div style={styles.cardIcon}>🔍</div>
             <h3 style={styles.cardTitle}>Evidence-First AI Reasoning</h3>
             <p style={styles.cardDesc}>
               Zero hallucinated metrics. Every hypothesis is mapped directly to actual database latencies, trace spans, and error logs.
             </p>
           </div>
           <div style={styles.card}>
-            <div style={styles.cardIcon}>ðŸ§ </div>
-            <h3 style={styles.cardTitle}>Google Gemini 2.5 Integration</h3>
+            <div style={styles.cardIcon}>🧠</div>
+            <h3 style={styles.cardTitle}>Amazon Bedrock AI Reasoning</h3>
             <p style={styles.cardDesc}>
               Deep multi-stage causal reasoning engine analyzing complex failure cascades across microservices.
             </p>
           </div>
           <div style={styles.card}>
-            <div style={styles.cardIcon}>ðŸ”Œ</div>
-            <h3 style={styles.cardTitle}>Native SigNoz & MCP Support</h3>
+            <div style={styles.cardIcon}>🔌</div>
+            <h3 style={styles.cardTitle}>Multi-Provider Observability</h3>
             <p style={styles.cardDesc}>
-              Direct Model Context Protocol integration with SigNoz observability stacks for automated telemetry collection.
+              Direct integration with AWS CloudWatch/X-Ray, SigNoz, OpenTelemetry, and deterministic demo simulation.
             </p>
           </div>
           <div style={styles.card}>
@@ -90,7 +90,7 @@ export default function LandingPage() {
             <ul style={styles.featureList}>
               <li>âœ“ 50 AI Investigations / mo</li>
               <li>âœ“ Single Microservice Scope</li>
-              <li>âœ“ Google Gemini 2.5 Flash Engine</li>
+              <li>âœ“ Amazon Bedrock AI Reasoning Engine</li>
               <li>âœ“ Standard Telemetry Support</li>
             </ul>
             <button style={styles.planButton} onClick={() => navigate("/dashboard")}>
@@ -105,11 +105,11 @@ export default function LandingPage() {
             <div style={styles.price}>$149<span> / month</span></div>
             <p style={styles.planDesc}>For production engineering teams demanding fast MTTR.</p>
             <ul style={styles.featureList}>
-              <li>âœ“ Unlimited AI Investigations</li>
-              <li>âœ“ Full Multi-Service Dependency Graphs</li>
-              <li>âœ“ Live SigNoz MCP Gateway Integration</li>
-              <li>âœ“ Google Gemini 2.5 Pro Reasoning</li>
-              <li>âœ“ Automated Actionable Remediation</li>
+              <li>✓ Unlimited AI Investigations</li>
+              <li>✓ Full Multi-Service Dependency Graphs</li>
+              <li>✓ Live Multi-Provider Observability (AWS, SigNoz, OTel)</li>
+              <li>✓ Amazon Bedrock AI Reasoning</li>
+              <li>✓ Automated Actionable Remediation</li>
             </ul>
             <button style={styles.featuredPlanButton} onClick={() => navigate("/pricing")}>
               Start Pro Trial
@@ -136,7 +136,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={styles.footer}>
-        <p>Â© 2026 TattvaAI Inc. Built for the Build with Gemini XPRIZE Hackathon.</p>
+        <p>Â© 2026 TattvaAI Inc. Autonomous Incident Investigation Platform.</p>
       </footer>
     </div>
   );

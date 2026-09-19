@@ -200,8 +200,8 @@ spec:
         
   # Deployment Configuration - Current State
   deployment:
-    mode: docker-compose
-    environment: development
+    mode: aws-serverless
+    environment: production
     demo_mode: true
     status:
       networks:

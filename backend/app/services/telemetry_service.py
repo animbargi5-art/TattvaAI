@@ -45,15 +45,19 @@ from app.telemetry.sources import TelemetrySource, get_telemetry_source
 class TelemetryService:
     """
     Core application telemetry service.
-    Delegates to the active TelemetrySource provider.
+    Delegates to the active TelemetrySource provider dynamically based on runtime context.
     """
 
     def __init__(self, source: Optional[TelemetrySource] = None) -> None:
-        self.source: TelemetrySource = source or get_telemetry_source()
-        logger.info(
-            "TelemetryService initialized with provider: %s",
-            self.source.__class__.__name__,
-        )
+        self._explicit_source: Optional[TelemetrySource] = source
+
+    @property
+    def source(self) -> TelemetrySource:
+        """Resolve current active TelemetrySource dynamically per investigation."""
+        if self._explicit_source is not None:
+            return self._explicit_source
+        active_source = get_telemetry_source()
+        return active_source
 
     @property
     def signoz(self) -> Any:

@@ -39,7 +39,7 @@ export const useInvestigation = (investigationId = null) => {
 
     // Create investigation mutation
     const createInvestigationMutation = useMutation({
-        mutationFn: investigationService.createInvestigation,
+        mutationFn: (data) => investigationService.createInvestigation(data),
         onSuccess: (newInvestigation) => {
             queryClient.invalidateQueries({ queryKey: ['investigations'] });
             showToast('Investigation created successfully', 'success');
@@ -65,7 +65,7 @@ export const useInvestigation = (investigationId = null) => {
 
     // Delete investigation mutation
     const deleteInvestigationMutation = useMutation({
-        mutationFn: investigationService.deleteInvestigation,
+        mutationFn: (id) => investigationService.deleteInvestigation(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['investigations'] });
             showToast('Investigation deleted successfully', 'success');
@@ -77,7 +77,7 @@ export const useInvestigation = (investigationId = null) => {
 
     // Start investigation mutation
     const startInvestigationMutation = useMutation({
-        mutationFn: investigationService.startInvestigation,
+        mutationFn: (params) => investigationService.startInvestigation(params),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['investigation', investigationId] });
             setIsPolling(true);
@@ -90,7 +90,7 @@ export const useInvestigation = (investigationId = null) => {
 
     // Stop investigation mutation
     const stopInvestigationMutation = useMutation({
-        mutationFn: investigationService.stopInvestigation,
+        mutationFn: (id) => investigationService.stopInvestigation(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['investigation', investigationId] });
             setIsPolling(false);
@@ -221,7 +221,7 @@ export const useInvestigations = (filters = {}) => {
 
     // Bulk operations
     const bulkDeleteMutation = useMutation({
-        mutationFn: investigationService.bulkDeleteInvestigations,
+        mutationFn: (ids) => investigationService.bulkDeleteInvestigations(ids),
         onSuccess: (result) => {
             queryClient.invalidateQueries({ queryKey: ['investigations'] });
             showToast(`Successfully deleted ${result.deleted} investigations`, 'success');
