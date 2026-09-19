@@ -36,6 +36,7 @@ if settings.FRONTEND_ORIGIN and settings.FRONTEND_ORIGIN not in cors_origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
+    allow_origin_regex=r"^https://.*\.amplifyapp\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

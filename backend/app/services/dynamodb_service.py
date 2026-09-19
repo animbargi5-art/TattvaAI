@@ -281,8 +281,13 @@ class DynamoDBService:
             logger.info("[DynamoDB] Attempting scan on table '%s' (limit=%d)", self.table_name, limit)
             response = table.scan(Limit=limit)
             items = response.get("Items", [])
-            logger.info("[DynamoDB] Scan returned %d items from table '%s'", len(items), self.table_name)
-            return [_decimal_to_native(item) for item in items]
+            # Filter out user entities if stored in the same table
+            filtered_items = [
+                item for item in items
+                if not str(item.get("incident_id", "")).startswith("USER#")
+            ]
+            logger.info("[DynamoDB] Scan returned %d investigation items from table '%s'", len(filtered_items), self.table_name)
+            return [_decimal_to_native(item) for item in filtered_items]
 
         except (ClientError, BotoCoreError) as e:
             logger.error("[DynamoDB] scan failed on table '%s': %s", self.table_name, e)

@@ -7,17 +7,17 @@ TattvaAI - Authentication Schemas
 from __future__ import annotations
 
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 class UserSignup(BaseModel):
-    email: EmailStr = Field(..., description="User corporate or personal email address")
+    email: str = Field(..., min_length=3, max_length=255, description="User corporate or personal email address")
     password: str = Field(..., min_length=6, description="Password (minimum 6 characters)")
     full_name: str = Field(..., min_length=1, max_length=100, description="Full name of the engineer")
 
 
 class UserLogin(BaseModel):
-    email: EmailStr = Field(..., description="Registered email address")
+    email: str = Field(..., min_length=3, max_length=255, description="Registered email address")
     password: str = Field(..., description="Account password")
 
 

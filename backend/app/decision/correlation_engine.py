@@ -578,7 +578,9 @@ class CorrelationEngine:
 
 
                 if ev_a.timestamp and ev_b.timestamp:
-                    diff_seconds = abs((ev_a.timestamp - ev_b.timestamp).total_seconds())
+                    ts_a = ev_a.timestamp.replace(tzinfo=None) if getattr(ev_a.timestamp, "tzinfo", None) else ev_a.timestamp
+                    ts_b = ev_b.timestamp.replace(tzinfo=None) if getattr(ev_b.timestamp, "tzinfo", None) else ev_b.timestamp
+                    diff_seconds = abs((ts_a - ts_b).total_seconds())
                     if diff_seconds <= window_seconds:
                         correlation = Correlation(
                             correlation_id=f"corr-temporal-{ev_a.evidence_id}-{ev_b.evidence_id}",

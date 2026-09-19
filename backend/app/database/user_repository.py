@@ -114,12 +114,14 @@ class SQLiteUserRepository(BaseUserRepository):
 class DynamoDBUserRepository(BaseUserRepository):
     """
     AWS DynamoDB user repository for serverless deployments.
+    Stores persistent user entities in the primary DynamoDB table (tattvaai_investigations)
+    under the partition key `incident_id = USER#<email>`.
     """
 
     def __init__(self) -> None:
         import boto3
         self.region = settings.AWS_REGION
-        self.table_name = getattr(settings, "USERS_TABLE_NAME", "tattvaai_users")
+        self.table_name = settings.DYNAMODB_TABLE_NAME
         self.aws_enabled = settings.AWS_ENABLED
         self._table = None
 
@@ -127,10 +129,14 @@ class DynamoDBUserRepository(BaseUserRepository):
             try:
                 dynamodb = boto3.resource("dynamodb", region_name=self.region)
                 self._table = dynamodb.Table(self.table_name)
+                logger.info(
+                    "[UserRepository] Initialized DynamoDB Table resource (Region: %s, Table: %s)",
+                    self.region,
+                    self.table_name,
+                )
             except Exception as e:
-                logger.warning("[UserRepository] DynamoDB init fallback: %s", e)
+                logger.warning("[UserRepository] DynamoDB initialization failed: %s", e)
 
-        # In-memory fallback if DynamoDB table not yet created
         self._fallback_store: Dict[str, UserEntity] = {}
 
     def create_user(self, email: str, full_name: str, hashed_password: str) -> UserEntity:
@@ -148,7 +154,9 @@ class DynamoDBUserRepository(BaseUserRepository):
         if self._table is not None:
             try:
                 item = {
-                    "email": user.email,
+                    "incident_id": f"USER#{normalized_email}",
+                    "entity_type": "USER",
+                    "email": normalized_email,
                     "id": str(user.id),
                     "full_name": user.full_name,
                     "hashed_password": user.hashed_password,
@@ -156,9 +164,15 @@ class DynamoDBUserRepository(BaseUserRepository):
                     "created_at": user.created_at.isoformat(),
                 }
                 self._table.put_item(Item=item)
+                logger.info(
+                    "[UserRepository] Successfully persisted user '%s' in DynamoDB table '%s'",
+                    normalized_email,
+                    self.table_name,
+                )
                 return user
             except Exception as e:
-                logger.warning("[UserRepository] DynamoDB put_item failed, falling back to memory: %s", e)
+                logger.error("[UserRepository] DynamoDB put_item failed for user '%s': %s", normalized_email, e)
+                raise
 
         self._fallback_store[normalized_email] = user
         return user
@@ -167,7 +181,7 @@ class DynamoDBUserRepository(BaseUserRepository):
         normalized_email = email.lower().strip()
         if self._table is not None:
             try:
-                response = self._table.get_item(Key={"email": normalized_email})
+                response = self._table.get_item(Key={"incident_id": f"USER#{normalized_email}"})
                 item = response.get("Item")
                 if item:
                     return UserEntity(
@@ -178,8 +192,10 @@ class DynamoDBUserRepository(BaseUserRepository):
                         is_active=item.get("is_active", True),
                         created_at=datetime.fromisoformat(item["created_at"]) if item.get("created_at") else None,
                     )
+                return None
             except Exception as e:
-                logger.warning("[UserRepository] DynamoDB get_item failed: %s", e)
+                logger.error("[UserRepository] DynamoDB get_item failed for user '%s': %s", normalized_email, e)
+                raise
 
         return self._fallback_store.get(normalized_email)
 

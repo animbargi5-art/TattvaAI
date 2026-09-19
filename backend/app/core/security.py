@@ -5,17 +5,45 @@ TattvaAI - Security & JWT Authentication Utilities
 
 Provides bcrypt password hashing, token generation, and JWT validation.
 Uses direct bcrypt hashing to avoid passlib 72-byte detection bug with modern bcrypt.
+Integrates with AWS Secrets Manager for production JWT secret retrieval.
 ===============================================================================
 """
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 import bcrypt
 from jose import JWTError, jwt
 
 from app.core.settings import settings
+
+
+def get_jwt_secret_key() -> str:
+    """
+    Retrieve JWT signing secret securely:
+    1. Check OS environment variable JWT_SECRET_KEY
+    2. If AWS Secrets Manager is enabled, fetch JWT_SECRET_KEY from tattvaai/production/secrets
+    3. Fallback to settings / safe local default
+    Never logs or exposes secret contents.
+    """
+    env_secret = os.environ.get("JWT_SECRET_KEY")
+    if env_secret:
+        return env_secret
+
+    if getattr(settings, "SECRETS_MANAGER_ENABLED", False) and getattr(settings, "AWS_ENABLED", False):
+        try:
+            from app.services.secrets_service import secrets_service
+            sec_dict = secrets_service.get_secret()
+            if sec_dict and isinstance(sec_dict, dict):
+                secret_val = sec_dict.get("JWT_SECRET_KEY") or sec_dict.get("jwt_secret")
+                if secret_val:
+                    return secret_val
+        except Exception:
+            pass
+
+    return getattr(settings, "JWT_SECRET_KEY", "tattvaai-jwt-secret-key-change-in-prod-super-secure")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -52,7 +80,7 @@ def create_access_token(
         "iat": datetime.utcnow(),
     })
     
-    secret_key = getattr(settings, "JWT_SECRET_KEY", "tattvaai-jwt-secret-key-change-in-prod-super-secure")
+    secret_key = get_jwt_secret_key()
     algorithm = getattr(settings, "JWT_ALGORITHM", "HS256")
     
     return jwt.encode(to_encode, secret_key, algorithm=algorithm)
@@ -63,6 +91,6 @@ def decode_access_token(token: str) -> Dict[str, Any]:
     Decode and validate a JWT access token.
     Raises JWTError on failure or expiration.
     """
-    secret_key = getattr(settings, "JWT_SECRET_KEY", "tattvaai-jwt-secret-key-change-in-prod-super-secure")
+    secret_key = get_jwt_secret_key()
     algorithm = getattr(settings, "JWT_ALGORITHM", "HS256")
     return jwt.decode(token, secret_key, algorithms=[algorithm])
