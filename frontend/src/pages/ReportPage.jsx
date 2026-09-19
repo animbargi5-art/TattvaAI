@@ -94,10 +94,79 @@ const ReportsPage = () => {
     }
 
     return (
-        <div className="page-container">
-            <div className="page-header">
-                <h1 className="page-title">Reports Dashboard</h1>
-                <p className="page-subtitle">Comprehensive analytics and insights for incident investigations</p>
+        <div className="reports-container">
+            <div className="page-title-row mb-4">
+                <h1 className="page-title">Reports &amp; Exports</h1>
+                <p className="page-subtitle">Generate and download comprehensive incident reports in JSON, Markdown, and PDF formats.</p>
+            </div>
+
+            {/* Export Cards Section */}
+            <div className="grid mb-4">
+                <div className="col-12 md:col-4">
+                    <div className="clean-card h-full flex flex-column justify-content-between">
+                        <div>
+                            <div className="flex align-items-center gap-3 mb-2">
+                                <div className="card-icon-badge">
+                                    <i className="pi pi-file"></i>
+                                </div>
+                                <h3 className="card-header-title">JSON Export</h3>
+                            </div>
+                            <p className="card-header-subtitle mb-4">
+                                Machine-readable structured telemetry payload with complete multi-agent evidence schema.
+                            </p>
+                        </div>
+                        <Button 
+                            label="Export JSON" 
+                            icon="pi pi-download" 
+                            className="btn-primary w-full"
+                            onClick={() => handleExport('json')}
+                        />
+                    </div>
+                </div>
+
+                <div className="col-12 md:col-4">
+                    <div className="clean-card h-full flex flex-column justify-content-between">
+                        <div>
+                            <div className="flex align-items-center gap-3 mb-2">
+                                <div className="card-icon-badge">
+                                    <i className="pi pi-file-edit"></i>
+                                </div>
+                                <h3 className="card-header-title">Markdown Export</h3>
+                            </div>
+                            <p className="card-header-subtitle mb-4">
+                                Clean formatted incident documentation suitable for GitHub issues, Slack, and postmortems.
+                            </p>
+                        </div>
+                        <Button 
+                            label="Export Markdown" 
+                            icon="pi pi-download" 
+                            className="btn-primary w-full"
+                            onClick={() => handleExport('markdown')}
+                        />
+                    </div>
+                </div>
+
+                <div className="col-12 md:col-4">
+                    <div className="clean-card h-full flex flex-column justify-content-between">
+                        <div>
+                            <div className="flex align-items-center gap-3 mb-2">
+                                <div className="card-icon-badge">
+                                    <i className="pi pi-file-pdf"></i>
+                                </div>
+                                <h3 className="card-header-title">PDF Export</h3>
+                            </div>
+                            <p className="card-header-subtitle mb-4">
+                                Executive audit-grade PDF report with timeline, root-cause graphs, and human review decisions.
+                            </p>
+                        </div>
+                        <Button 
+                            label="Export PDF" 
+                            icon="pi pi-download" 
+                            className="btn-primary w-full"
+                            onClick={() => handleExport('pdf')}
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Filters and Controls */}

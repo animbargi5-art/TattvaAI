@@ -340,17 +340,15 @@ const HistoryPage = () => {
     }
 
     return (
-        <div className="history-page p-4 max-w-7xl mx-auto">
-            <Card className="shadow-1 border-1 surface-border">
-                <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between mb-3 gap-2">
-                    <div>
-                        <h1 className="text-2xl font-bold text-900 m-0">Investigation History</h1>
-                        <p className="text-600 text-sm m-0 mt-1">
-                            Audited incident investigations across AWS Observability, SigNoz, OpenTelemetry, and Demo telemetry.
-                        </p>
-                    </div>
-                </div>
+        <div className="history-container">
+            <div className="page-title-row mb-4">
+                <h1 className="page-title">Investigation History</h1>
+                <p className="page-subtitle">
+                    Audit trail of all past incident investigations and root cause analyses.
+                </p>
+            </div>
 
+            <div className="clean-card p-0" style={{ padding: 0 }}>
                 <DataTable
                     value={investigations}
                     loading={isLoading}
@@ -438,7 +436,7 @@ const HistoryPage = () => {
                         style={{ minWidth: '8rem' }}
                     />
                 </DataTable>
-            </Card>
+            </div>
         </div>
     );
 };

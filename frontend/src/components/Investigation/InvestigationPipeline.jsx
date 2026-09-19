@@ -36,9 +36,9 @@ export default function InvestigationPipeline({ investigation = {} }) {
 
     // Model description dynamically resolved from backend
     const modelId = investigation?.reasoning?.model_id || report?.reasoning?.model_id;
-    const reasoningDesc = (modelId && modelId !== "mock-bedrock")
-        ? `Amazon Bedrock AI reasoning (${modelId})`
-        : "Amazon Bedrock AI reasoning";
+    const reasoningDesc = (modelId && !modelId.toLowerCase().includes("mock"))
+        ? `AI reasoning engine (${modelId})`
+        : "Autonomous AI reasoning engine";
 
     // Standard canonical 8-stage investigation pipeline
     const baseStages = [

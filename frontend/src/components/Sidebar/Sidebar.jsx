@@ -1,16 +1,11 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu } from "primereact/menu";
-import { Badge } from "primereact/badge";
 import { useState, useEffect, useCallback } from "react";
 import telemetryService from "../../services/telemetryService";
 import dashboardService from "../../services/dashboardService";
 
-import "../../styles/layouts/sidebar.css";
-
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [activeRoute, setActiveRoute] = useState(location.pathname);
     const [backendOnline, setBackendOnline] = useState(true);
     const [telemetryStatus, setTelemetryStatus] = useState({
         provider: "aws",
@@ -18,12 +13,11 @@ export default function Sidebar() {
         connected: true,
         mode: "LIVE",
         text: "AWS Observability — LIVE",
-        dotColor: "text-green-500"
+        dotColor: "var(--success)"
     });
 
     // Check backend health and dynamic telemetry provider status
     const checkStatuses = useCallback(async () => {
-        // 1. Check Backend Online
         try {
             await dashboardService.getBackendStatus();
             setBackendOnline(true);
@@ -31,7 +25,6 @@ export default function Sidebar() {
             setBackendOnline(false);
         }
 
-        // 2. Check Telemetry Status for active provider
         const activeProv = telemetryService.getActiveProvider() || "aws";
         try {
             const testRes = await telemetryService.testProviderConnection({ provider: activeProv });
@@ -42,76 +35,34 @@ export default function Sidebar() {
                     connected: true,
                     mode: "DEMO",
                     text: "Mock / Demo — DEMO",
-                    dotColor: "text-yellow-500"
+                    dotColor: "var(--warning)"
                 });
             } else if (activeProv === "aws" || activeProv === "cloudwatch") {
-                if (testRes.connected) {
-                    setTelemetryStatus({
-                        provider: "aws",
-                        name: "AWS Observability",
-                        connected: true,
-                        mode: "LIVE",
-                        text: "AWS Observability — LIVE",
-                        dotColor: "text-green-500"
-                    });
-                } else {
-                    setTelemetryStatus({
-                        provider: "aws",
-                        name: "AWS Observability",
-                        connected: false,
-                        mode: "LIVE",
-                        text: "AWS Observability — NOT CONNECTED",
-                        dotColor: "text-red-500"
-                    });
-                }
+                setTelemetryStatus({
+                    provider: "aws",
+                    name: "AWS Observability",
+                    connected: !!testRes.connected,
+                    mode: "LIVE",
+                    text: testRes.connected ? "AWS Observability — LIVE" : "AWS Observability — NOT CONNECTED",
+                    dotColor: testRes.connected ? "var(--success)" : "var(--danger)"
+                });
             } else if (activeProv === "signoz") {
-                if (testRes.connected) {
-                    setTelemetryStatus({
-                        provider: "signoz",
-                        name: "SigNoz",
-                        connected: true,
-                        mode: "LIVE",
-                        text: "SigNoz — LIVE",
-                        dotColor: "text-green-500"
-                    });
-                } else {
-                    setTelemetryStatus({
-                        provider: "signoz",
-                        name: "SigNoz",
-                        connected: false,
-                        mode: "LIVE",
-                        text: "SigNoz — NOT CONNECTED",
-                        dotColor: "text-orange-500"
-                    });
-                }
-            } else if (activeProv === "opentelemetry" || activeProv === "otlp") {
-                if (testRes.connected) {
-                    setTelemetryStatus({
-                        provider: "opentelemetry",
-                        name: "OpenTelemetry",
-                        connected: true,
-                        mode: "LIVE",
-                        text: "OpenTelemetry — LIVE",
-                        dotColor: "text-green-500"
-                    });
-                } else {
-                    setTelemetryStatus({
-                        provider: "opentelemetry",
-                        name: "OpenTelemetry",
-                        connected: false,
-                        mode: "LIVE",
-                        text: "OpenTelemetry — NOT CONNECTED",
-                        dotColor: "text-orange-500"
-                    });
-                }
+                setTelemetryStatus({
+                    provider: "signoz",
+                    name: "SigNoz",
+                    connected: !!testRes.connected,
+                    mode: "LIVE",
+                    text: testRes.connected ? "SigNoz — LIVE" : "SigNoz — NOT CONNECTED",
+                    dotColor: testRes.connected ? "var(--success)" : "var(--danger)"
+                });
             } else {
                 setTelemetryStatus({
                     provider: activeProv,
-                    name: activeProv,
+                    name: activeProv.toUpperCase(),
                     connected: !!testRes.connected,
                     mode: testRes.mode || "LIVE",
                     text: `${activeProv.toUpperCase()} — ${testRes.connected ? "LIVE" : "NOT CONNECTED"}`,
-                    dotColor: testRes.connected ? "text-green-500" : "text-orange-500"
+                    dotColor: testRes.connected ? "var(--success)" : "var(--warning)"
                 });
             }
         } catch {
@@ -121,23 +72,15 @@ export default function Sidebar() {
                 connected: false,
                 mode: "UNKNOWN",
                 text: "Telemetry — Status unavailable",
-                dotColor: "text-gray-400"
+                dotColor: "var(--text-muted)"
             });
         }
     }, []);
 
-    // Update active route when location changes
-    useEffect(() => {
-        setActiveRoute(location.pathname);
-    }, [location.pathname]);
-
-    // Poll status and listen for provider changes
     useEffect(() => {
         checkStatuses();
         const interval = setInterval(checkStatuses, 30000);
-        const handleProviderChange = () => {
-            checkStatuses();
-        };
+        const handleProviderChange = () => checkStatuses();
         window.addEventListener("tattvaai:provider-changed", handleProviderChange);
         return () => {
             clearInterval(interval);
@@ -145,138 +88,115 @@ export default function Sidebar() {
         };
     }, [checkStatuses]);
 
-    const menuItems = [
-        {
-            label: 'Main',
-            items: [
-                {
-                    label: 'Dashboard',
-                    icon: 'pi pi-home',
-                    command: () => navigate('/dashboard'),
-                    className: activeRoute === '/dashboard' ? 'active-menu-item' : ''
-                },
-                {
-                    label: 'Investigations',
-                    icon: 'pi pi-search',
-                    items: [
-                        {
-                            label: 'Active Investigation',
-                            icon: 'pi pi-play',
-                            command: () => navigate('/investigation/active'),
-                            disabled: true // Enable when there's an active investigation
-                        },
-                        {
-                            label: 'Start New',
-                            icon: 'pi pi-plus',
-                            command: () => navigate('/dashboard') // Redirect to dashboard to start
-                        }
-                    ]
-                },
-                {
-                    label: 'History',
-                    icon: 'pi pi-history',
-                    command: () => navigate('/history'),
-                    className: activeRoute === '/history' ? 'active-menu-item' : ''
-                },
-                {
-                    label: 'Reports',
-                    icon: 'pi pi-chart-bar',
-                    command: () => navigate('/reports'),
-                    className: activeRoute === '/reports' ? 'active-menu-item' : ''
-                }
-            ]
-        },
-        {
-            separator: true
-        },
-        {
-            label: 'Management',
-            items: [
-                {
-                    label: 'Settings',
-                    icon: 'pi pi-cog',
-                    command: () => navigate('/settings'),
-                    className: activeRoute === '/settings' ? 'active-menu-item' : ''
-                }
-            ]
-        },
-        {
-            separator: true
-        },
-        {
-            label: 'Future Features',
-            items: [
-                {
-                    label: 'Notifications',
-                    icon: 'pi pi-bell',
-                    badge: '3', // Example notification count
-                    command: () => navigate('/notifications'),
-                    disabled: true,
-                    template: (item, options) => (
-                        <div className={options.className} onClick={options.onClick}>
-                            <span className={options.iconClassName}></span>
-                            <span className={options.labelClassName}>{item.label}</span>
-                            {item.badge && (
-                                <Badge
-                                    value={item.badge}
-                                    severity="danger"
-                                    className="ml-auto"
-                                />
-                            )}
-                        </div>
-                    )
-                },
-                {
-                    label: 'Live Monitoring',
-                    icon: 'pi pi-eye',
-                    command: () => navigate('/live-monitoring'),
-                    disabled: true
-                },
-                {
-                    label: 'Knowledge Graph',
-                    icon: 'pi pi-sitemap',
-                    command: () => navigate('/knowledge-graph'),
-                    disabled: true
-                },
-                {
-                    label: 'AI Assistant',
-                    icon: 'pi pi-comments',
-                    command: () => navigate('/ai-assistant'),
-                    disabled: true
-                }
-            ]
+    const isCurrent = (path) => {
+        if (path === "/dashboard") {
+            return location.pathname === "/dashboard";
         }
-    ];
+        return location.pathname.startsWith(path);
+    };
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar-header">
-                <div className="logo-section">
-                    <i className="pi pi-bolt logo-icon"></i>
-                    <h2 className="logo-text">TattvaAI</h2>
+        <aside className="sidebar-clean">
+            {/* Header / Brand */}
+            <div className="sidebar-logo-area">
+                <div className="sidebar-logo-brand">
+                    <i className="pi pi-bolt sidebar-logo-icon"></i>
+                    <span className="sidebar-logo-name">TattvaAI</span>
                 </div>
-                <p className="tagline">AI Investigation Platform</p>
+                <span className="sidebar-tagline">AI Investigation Platform</span>
             </div>
 
-            <div className="sidebar-menu">
-                <Menu
-                    model={menuItems}
-                    className="navigation-menu"
-                />
+            {/* Navigation Sections */}
+            <div className="sidebar-nav-container">
+                {/* Section: MAIN */}
+                <div className="sidebar-section-label">MAIN</div>
+                <div 
+                    className={`sidebar-nav-item ${isCurrent("/dashboard") ? "active" : ""}`}
+                    onClick={() => navigate("/dashboard")}
+                >
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-home sidebar-nav-item-icon"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+
+                <div 
+                    className={`sidebar-nav-item ${location.pathname.startsWith("/investigation") ? "active" : ""}`}
+                    onClick={() => navigate("/dashboard")}
+                >
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-search sidebar-nav-item-icon"></i>
+                        <span>Investigations</span>
+                    </div>
+                </div>
+
+                <div 
+                    className={`sidebar-nav-item ${isCurrent("/history") ? "active" : ""}`}
+                    onClick={() => navigate("/history")}
+                >
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-history sidebar-nav-item-icon"></i>
+                        <span>History</span>
+                    </div>
+                </div>
+
+                <div 
+                    className={`sidebar-nav-item ${isCurrent("/reports") ? "active" : ""}`}
+                    onClick={() => navigate("/reports")}
+                >
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-chart-bar sidebar-nav-item-icon"></i>
+                        <span>Reports</span>
+                    </div>
+                </div>
+
+                {/* Section: MANAGEMENT */}
+                <div className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>MANAGEMENT</div>
+                <div 
+                    className={`sidebar-nav-item ${isCurrent("/settings") ? "active" : ""}`}
+                    onClick={() => navigate("/settings")}
+                >
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-cog sidebar-nav-item-icon"></i>
+                        <span>Settings</span>
+                    </div>
+                </div>
+
+                {/* Section: FUTURE FEATURES */}
+                <div className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>FUTURE FEATURES</div>
+                <div className="sidebar-nav-item disabled">
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-bell sidebar-nav-item-icon"></i>
+                        <span>Notifications</span>
+                    </div>
+                    <span className="sidebar-nav-badge">3</span>
+                </div>
+
+                <div className="sidebar-nav-item disabled">
+                    <div className="sidebar-nav-item-left">
+                        <i className="pi pi-chart-line sidebar-nav-item-icon"></i>
+                        <span>Live Monitoring</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="sidebar-footer">
-                <div className="status-section">
-                    <div className="status-item" title={backendOnline ? "Backend API Gateway & Lambda Online" : "Backend Offline"}>
-                        <i className={`pi pi-circle-fill ${backendOnline ? "text-green-500" : "text-red-500"}`}></i>
-                        <span>Backend {backendOnline ? "Online" : "Offline"}</span>
-                    </div>
-                    <div className="status-item" title={telemetryStatus.text}>
-                        <i className={`pi pi-circle-fill ${telemetryStatus.dotColor}`}></i>
-                        <span className="white-space-nowrap overflow-hidden text-overflow-ellipsis" style={{ maxWidth: '170px' }}>
-                            {telemetryStatus.text}
-                        </span>
-                    </div>
+            {/* Sidebar Footer Status */}
+            <div className="sidebar-footer-card">
+                <div className="sidebar-status-row" title={backendOnline ? "Backend API Gateway & Lambda Online" : "Backend Offline"}>
+                    <span 
+                        className="status-dot-green" 
+                        style={{ backgroundColor: backendOnline ? "var(--success)" : "var(--danger)" }}
+                    ></span>
+                    <span>Backend {backendOnline ? "Online" : "Offline"}</span>
+                </div>
+                <div className="sidebar-status-row" title={telemetryStatus.text}>
+                    <span 
+                        className="status-dot-green" 
+                        style={{ backgroundColor: telemetryStatus.dotColor }}
+                    ></span>
+                    <span className="white-space-nowrap overflow-hidden text-overflow-ellipsis" style={{ maxWidth: "165px" }}>
+                        {telemetryStatus.text}
+                    </span>
                 </div>
             </div>
         </aside>

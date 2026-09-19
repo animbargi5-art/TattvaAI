@@ -246,164 +246,58 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="dashboard-page p-4">
+        <div className="dashboard-container">
             {/* Page Header */}
-            <div className="dashboard-header mb-4">
-                <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-3">
-                    <div>
-                        <h1 className="text-3xl font-bold text-900 m-0">TattvaAI Dashboard</h1>
-                        <p className="text-600 m-0 mt-1">
-                            Autonomous multi-signal incident investigation & AI root-cause reasoning
-                        </p>
-                    </div>
-                    <div className="flex align-items-center gap-2">
-                        <Button
-                            label="Refresh"
-                            icon="pi pi-refresh"
-                            className="p-button-outlined"
-                            onClick={refreshDashboard}
-                            loading={statsLoading || investigationsLoading}
-                        />
-                    </div>
+            <div className="page-title-row flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-3 mb-4">
+                <div>
+                    <h1 className="page-title">Dashboard</h1>
+                    <p className="page-subtitle">
+                        Real-time AI-powered telemetry investigation & service health overview.
+                    </p>
+                </div>
+                <div className="flex align-items-center gap-2">
+                    <Button
+                        label="Start Investigation"
+                        icon="pi pi-bolt"
+                        className="btn-primary"
+                        onClick={handleStartInvestigation}
+                        loading={startInvestigationMutation.isPending}
+                    />
+                    <Button
+                        icon="pi pi-refresh"
+                        className="p-button-outlined"
+                        onClick={refreshDashboard}
+                        loading={statsLoading || investigationsLoading}
+                        tooltip="Refresh Dashboard"
+                    />
                 </div>
             </div>
 
-            {/* Compact Telemetry & Backend Status Section */}
-            <div className="grid mb-4">
-                <div className="col-12">
-                    <Card className="surface-card border-1 surface-border shadow-1 p-3">
-                        <div className="flex flex-column lg:flex-row lg:align-items-center justify-content-between gap-3">
-                            <div className="flex align-items-center gap-3">
-                                <div className="flex align-items-center justify-content-center surface-100 border-circle w-3rem h-3rem">
-                                    <i className="pi pi-compass text-primary text-xl"></i>
-                                </div>
-                                <div>
-                                    <div className="text-xs text-500 font-semibold uppercase tracking-wider">
-                                        Telemetry Source
-                                    </div>
-                                    <div className="text-900 font-bold text-lg flex align-items-center gap-2">
-                                        <span>
-                                            {telemetryLoading ? "Loading..." : (activeTelemetryStatus?.name || "Status unavailable")}
-                                        </span>
-                                        {activeTelemetryStatus && (
-                                            <Tag
-                                                value={activeTelemetryStatus.mode}
-                                                severity={activeTelemetryStatus.mode === 'LIVE' ? 'success' : 'warning'}
-                                                className="text-xs font-bold"
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-wrap align-items-center gap-4">
-                                <div>
-                                    <div className="text-xs text-500 font-semibold uppercase tracking-wider">Mode</div>
-                                    <div className="font-bold text-sm text-800">
-                                        {telemetryLoading ? (
-                                            <span className="text-500">Checking...</span>
-                                        ) : activeTelemetryStatus ? (
-                                            activeTelemetryStatus.mode === 'LIVE' ? (
-                                                <span className="text-green-600">● LIVE</span>
-                                            ) : (
-                                                <span className="text-yellow-600">● DEMO</span>
-                                            )
-                                        ) : (
-                                            <span className="text-500">Status unavailable</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div className="text-xs text-500 font-semibold uppercase tracking-wider">Provider Status</div>
-                                    <div className="font-bold text-sm">
-                                        {telemetryLoading ? (
-                                            <span className="text-500">Verifying...</span>
-                                        ) : activeTelemetryStatus ? (
-                                            activeTelemetryStatus.connected ? (
-                                                <span className="text-green-600">● Verified Live</span>
-                                            ) : activeTelemetryStatus.id === 'signoz' ? (
-                                                <span className="text-orange-600">● Not Verified / Not Connected</span>
-                                            ) : (
-                                                <span className="text-orange-600">● Not Connected</span>
-                                            )
-                                        ) : (
-                                            <span className="text-500">Status unavailable</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div className="text-xs text-500 font-semibold uppercase tracking-wider">Backend</div>
-                                    <div className="font-bold text-sm">
-                                        {backendHealth ? (
-                                            <span className="text-green-600">● Online (AWS Lambda)</span>
-                                        ) : (
-                                            <span className="text-red-500">● Offline</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <Button
-                                    label="Configure Providers"
-                                    icon="pi pi-cog"
-                                    size="small"
-                                    outlined
-                                    severity="secondary"
-                                    onClick={() => navigate('/settings')}
-                                    className="p-button-sm"
-                                />
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            </div>
-
-            {/* Investigation Control Block */}
-            <Card className="investigation-control-block mb-4" style={{background: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)', border: '1px solid #0284c7'}}>
-                <div className="text-white">
-                    <div className="flex flex-column md:flex-row md:align-items-center justify-content-between gap-3">
-                        <div>
-                            <div className="flex align-items-center mb-2">
-                                <i className="pi pi-shield text-2xl mr-2"></i>
-                                <h2 className="text-2xl font-bold m-0">Investigation Control</h2>
-                            </div>
-                            <p className="text-100 m-0 text-lg">
-                                Launch AI-powered autonomous incident investigation with our 8-stage AI investigation pipeline
-                            </p>
-                            <div className="flex align-items-center mt-2 text-sm text-200">
-                                <i className="pi pi-clock mr-1"></i>
-                                <span>Multi-agent correlation &amp; AI reasoning &middot; Real-time human review</span>
-                            </div>
-                        </div>
-                        <div className="text-center md:text-right">
-                            <Button
-                                label={isInvestigationRunning ? "Investigation Running..." : "Start New Investigation"}
-                                icon={isInvestigationRunning ? "pi pi-spin pi-spinner" : "pi pi-play"}
-                                onClick={handleStartInvestigation}
-                                disabled={isInvestigationRunning || investigationStatus?.status === 'running'}
-                                loading={startInvestigationMutation.isPending}
-                                className="p-button-success p-button-lg shadow-2"
-                                style={{minWidth: '220px', background: '#22c55e', borderColor: '#22c55e', color: '#fff'}}
-                            />
-                            {investigationStatus?.status === 'running' && (
-                                <div className="mt-2 text-100 text-sm">
-                                    <i className="pi pi-spin pi-spinner mr-1"></i>
-                                    Investigation in progress...
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </Card>
+            {/* Statistics Block */}
+            {statsError ? (
+                <DashboardError error={statsError} />
+            ) : (
+                <StatisticsCards 
+                    stats={dashboardStats} 
+                    investigations={investigations} 
+                    loading={statsLoading}
+                />
+            )}
 
             {/* Status and Progress Blocks */}
             <div className="grid mb-4">
                 <div className="col-12 lg:col-6">
-                    <Card className="investigation-status-block h-full border-1 surface-border shadow-1">
-                        <div className="flex align-items-center mb-3">
-                            <i className="pi pi-info-circle text-primary text-2xl mr-3"></i>
-                            <h3 className="text-xl font-semibold m-0 text-900">Investigation Status</h3>
+                    <Card className="investigation-status-block h-full">
+                        <div className="card-header-clean">
+                            <div className="card-header-title-group">
+                                <div className="card-icon-badge">
+                                    <i className="pi pi-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h3 className="card-header-title">Investigation Status</h3>
+                                    <p className="card-header-subtitle">Real-time incident state and progress</p>
+                                </div>
+                            </div>
                         </div>
                         <InvestigationStatus 
                             status={investigationStatus}
@@ -413,10 +307,17 @@ export default function DashboardPage() {
                     </Card>
                 </div>
                 <div className="col-12 lg:col-6">
-                    <Card className="investigation-progress-block h-full border-1 surface-border shadow-1">
-                        <div className="flex align-items-center mb-3">
-                            <i className="pi pi-chart-line text-green-600 text-2xl mr-3"></i>
-                            <h3 className="text-xl font-semibold m-0 text-900">8-Stage Pipeline Workflow</h3>
+                    <Card className="investigation-progress-block h-full">
+                        <div className="card-header-clean">
+                            <div className="card-header-title-group">
+                                <div className="card-icon-badge">
+                                    <i className="pi pi-chart-line"></i>
+                                </div>
+                                <div>
+                                    <h3 className="card-header-title">8-Stage Pipeline Workflow</h3>
+                                    <p className="card-header-subtitle">Multi-agent investigation lifecycle</p>
+                                </div>
+                            </div>
                         </div>
                         <InvestigationProgress 
                             status={investigationStatus}
@@ -425,23 +326,6 @@ export default function DashboardPage() {
                     </Card>
                 </div>
             </div>
-
-            {/* Statistics Block */}
-            <Card className="statistics-block mb-4 border-1 surface-border shadow-1">
-                <div className="flex align-items-center mb-3">
-                    <i className="pi pi-chart-bar text-orange-600 text-2xl mr-3"></i>
-                    <h3 className="text-xl font-semibold m-0 text-900">Investigation Analytics</h3>
-                </div>
-                {statsError ? (
-                    <DashboardError error={statsError} />
-                ) : (
-                    <StatisticsCards 
-                        stats={dashboardStats} 
-                        investigations={investigations} 
-                        loading={statsLoading}
-                    />
-                )}
-            </Card>
 
             {/* Recent Investigations Block */}
             <Card className="recent-investigations-block border-1 surface-border shadow-1">
