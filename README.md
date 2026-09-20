@@ -35,14 +35,17 @@ Instead of manual guessing, TattvaAI orchestrates an **8-stage multi-agent telem
 ## ✨ Core Highlights
 
 - 🔐 **Persistent JWT Authentication**: Secure, bcrypt-hashed engineer authentication stored in Amazon DynamoDB (`tattvaai_users`) with 7-day persistent session management and protected client-side routing.
+- 🏢 **Work Email Enforcement**: Enterprise signup gate ensuring accounts use corporate or organization emails, rejecting personal domains (`gmail.com`, `yahoo.com`, `outlook.com`, etc.) at both backend and frontend layers.
 - 🤖 **8-Stage Multi-Agent Pipeline**: Dedicated analysis agents process Traces, Logs, Metrics, Service Dependencies, Alerts, Historical Incident Patterns, Cross-Correlation, and Causal Reasoning.
 - 🔒 **Zero Telemetry Hallucinations**: Every observation, hypothesis, and recommendation is strictly linked to a concrete `evidence_id` retrieved directly from your observability stack.
+- 🕵️‍♂️ **Telemetry Provenance & "Where did this come from?" Inspector**: Deep traceability modal for every agent and evidence signal. Truthfully labels telemetry sources (AWS Observability, AWS X-Ray, CloudWatch, SigNoz, or Synthetic Demo) with verified AWS console deep-links for real traces.
 - 🧠 **Explainable AI Reasoning**: Formulates step-by-step causal explanations, separates symptoms from root causes, and highlights known uncertainties.
+- 🧭 **Sticky Quick Navigation & Direct Route**: Context-aware sub-navbar for instant single-click jumping between investigation sections (`[Summary] [Pipeline] [Evidence] [Reasoning] [Human Review] [Actions]`), plus direct `/investigations` landing with launch CTA and history.
 - 👤 **Human-in-the-Loop Review**: AI never blindly modifies production. SREs can accept, reject, or comment on findings before any remediation executes.
 - ☁️ **100% Serverless on AWS**: Runs on AWS Lambda, Amazon API Gateway, DynamoDB, S3, and AWS Amplify Hosting — zero servers to patch or idle compute costs.
 - 📄 **One-Click Post-Mortem Reports**: Instantly export complete investigation reports to PDF, JSON, or Markdown for post-mortems and compliance.
 - 🔌 **Multi-Provider Telemetry**: Works seamlessly with **AWS Observability** (CloudWatch Logs/Metrics + AWS X-Ray), **SigNoz OTLP**, or an offline **Demo/Mock mode** for training.
-- 🎨 **Modern Developer UI**: Linear/Vercel-inspired clean blue/white palette, responsive layout, information-rich data tables, and dynamic React Flow dependency graphs.
+- 🎨 **Modern Developer UI**: Linear/Vercel-inspired clean blue/white palette, responsive layout, compact developer-card typography, and dynamic React Flow dependency graphs.
 
 ---
 
@@ -177,7 +180,7 @@ For detailed AWS setup, IAM policies, and infrastructure configuration, see [doc
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/auth/signup` | Create an engineer account (bcrypt password hashing) |
+| `POST` | `/auth/signup` | Create an engineer account with work email enforcement (bcrypt password hashing) |
 | `POST` | `/auth/login` | Authenticate credentials and receive persistent 7-day JWT |
 | `GET` | `/auth/me` | Fetch authenticated operator profile |
 | `GET` | `/health` | System health check (`{"status": "healthy"}`) |
@@ -191,6 +194,21 @@ For detailed AWS setup, IAM policies, and infrastructure configuration, see [doc
 | `GET` | `/investigation/{id}/export/pdf` | Download formatted PDF incident post-mortem |
 | `GET` | `/investigation/{id}/export/json` | Export raw JSON investigation report |
 | `GET` | `/investigation/{id}/export/markdown` | Export Markdown post-mortem document |
+
+---
+
+## 🖥️ Frontend Application Routes
+
+| Route | View | Description |
+| :--- | :--- | :--- |
+| `/login` | **Operator Sign In** | Work account credentials sign-in with 7-day persistent session |
+| `/signup` | **Account Creation** | Corporate signup with domain validation and duplicate account resolution |
+| `/dashboard` | **SRE Dashboard** | Real-time system health, telemetry status, and compact recent investigation cards |
+| `/investigations` | **Investigations Landing** | Direct route with clean idle state, Launch Investigation CTA, and prior history |
+| `/investigation/:id` | **Investigation Detail** | Complete 8-stage pipeline, sticky quick-nav, evidence provenance inspector, and human review |
+| `/history` | **Incident History** | Searchable audit trail of past incidents and investigations from DynamoDB |
+| `/reports` | **Post-Mortem Reports** | One-click PDF, JSON, and Markdown export for compliance and post-mortems |
+| `/settings` | **Telemetry Settings** | Live connectivity testing for AWS Observability, SigNoz, and OTLP |
 
 ---
 
