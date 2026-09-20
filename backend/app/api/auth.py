@@ -12,6 +12,8 @@ Endpoints:
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
@@ -136,6 +138,14 @@ def login(payload: UserLogin):
     """
     Authenticate an existing engineer, verify password hash, and return a 7-day JWT session.
     """
+    # Check for work email requirement upfront for better UX
+    # (without exposing whether an account exists)
+    if not is_work_email(payload.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please sign in using your work or organization email address.",
+        )
+    
     repo = get_user_repository()
     try:
         user = repo.get_by_email(payload.email)
