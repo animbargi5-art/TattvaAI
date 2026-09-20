@@ -122,7 +122,7 @@ export default function Sidebar() {
 
                 <div 
                     className={`sidebar-nav-item ${location.pathname.startsWith("/investigation") ? "active" : ""}`}
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/investigations")}
                 >
                     <div className="sidebar-nav-item-left">
                         <i className="pi pi-search sidebar-nav-item-icon"></i>

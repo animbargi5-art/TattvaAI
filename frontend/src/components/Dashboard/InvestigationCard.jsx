@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Tag } from "primereact/tag";
 import "../../styles/investigation-card.css";
 
 export default function InvestigationCard({ investigation }) {
@@ -22,33 +23,48 @@ export default function InvestigationCard({ investigation }) {
         ? investigation.status
         : "COMPLETED";
 
+    const severity = (investigation.severity || "LOW").toUpperCase();
+    const severityMap = {
+        CRITICAL: "danger",
+        HIGH: "warning",
+        MEDIUM: "info",
+        LOW: "success"
+    };
+
     return (
         <div
-            className="investigation-card"
+            className="investigation-card p-3 mb-2"
             onClick={openInvestigation}
             style={{ cursor: "pointer" }}
         >
-            <h2>{displayTitle}</h2>
+            <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-2 mb-2">
+                <h4 className="investigation-card-title m-0 text-900 font-semibold" style={{ fontSize: "0.9375rem" }}>
+                    {displayTitle}
+                </h4>
+                <div className="flex align-items-center gap-2">
+                    <Tag 
+                        value={severity} 
+                        severity={severityMap[severity] || "info"} 
+                        className="text-xs font-semibold px-2 py-0"
+                    />
+                    <Tag 
+                        value={displayStatus} 
+                        severity={displayStatus === "COMPLETED" ? "success" : "info"} 
+                        className="text-xs font-semibold px-2 py-0"
+                    />
+                </div>
+            </div>
 
-            <p>
-                <strong>Incident ID:</strong>{" "}
-                {investigation.incident_id || id}
-            </p>
-
-            <p>
-                <strong>Severity:</strong>{" "}
-                {investigation.severity || "LOW"}
-            </p>
-
-            <p>
-                <strong>Status:</strong>{" "}
-                {displayStatus}
-            </p>
-
-            <p>
-                <strong>Confidence:</strong>{" "}
-                {investigation.confidence ?? 0}%
-            </p>
+            <div className="flex flex-wrap align-items-center justify-content-between text-xs text-600 gap-2 pt-1 border-top-1 surface-border">
+                <div className="flex align-items-center gap-1">
+                    <span className="text-500 font-medium">Incident ID:</span>
+                    <span className="font-mono text-800 font-semibold">{investigation.incident_id || id}</span>
+                </div>
+                <div className="flex align-items-center gap-1">
+                    <span className="text-500 font-medium">Confidence:</span>
+                    <span className="font-semibold text-primary">{investigation.confidence ?? 0}%</span>
+                </div>
+            </div>
         </div>
     );
 }

@@ -27,6 +27,8 @@ export default function MainLayout({ children }) {
             items = [{ label: "History" }];
         } else if (path === "/reports") {
             items = [{ label: "Reports" }];
+        } else if (path === "/investigations" || path === "/investigation") {
+            items = [{ label: "Investigations" }];
         } else if (path.startsWith("/investigation/")) {
             const id = path.split("/")[2] || "";
             items = [

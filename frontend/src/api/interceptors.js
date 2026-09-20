@@ -53,14 +53,18 @@ api.interceptors.response.use(
                     severity = 'warn';
                     break;
                 case 401:
-                    errorMessage = 'Authentication required';
+                    errorMessage = data.detail || 'Authentication required';
                     // Redirect to login if implemented
                     break;
                 case 403:
-                    errorMessage = 'Access forbidden';
+                    errorMessage = data.detail || 'Access forbidden';
                     break;
                 case 404:
-                    errorMessage = 'Resource not found';
+                    errorMessage = data.detail || 'Resource not found';
+                    severity = 'warn';
+                    break;
+                case 409:
+                    errorMessage = data.detail || 'An account with this email already exists. Please sign in.';
                     severity = 'warn';
                     break;
                 case 422:

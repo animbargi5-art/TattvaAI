@@ -1,28 +1,109 @@
-/* Investigation Evidence Panel */
+/* Investigation Evidence Panel Styles */
 .evidence-panel {
-    background: white;
-    border: 1px solid var(--surface-border);
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--surface-border, #e2e8f0);
     border-radius: 8px;
 }
 
-.evidence-tabs .p-tabview-nav {
-    background: var(--surface-50);
-    border-bottom: 1px solid var(--surface-border);
-}
-
-.evidence-content {
-    padding: 1.5rem;
-}
-
-.evidence-item {
-    margin-bottom: 1rem;
+.evidence-panel .p-card-body {
     padding: 1rem;
-    border: 1px solid var(--surface-border);
-    border-radius: 6px;
 }
 
-@media (max-width: 768px) {
-    .evidence-content {
-        padding: 1rem;
-    }
+.evidence-panel .p-card-content {
+    padding: 0;
+}
+
+/* Tab Navigation Styling */
+.evidence-tabs .p-tabview-nav-container {
+    border-bottom: 1px solid var(--surface-border, #e2e8f0);
+}
+
+.evidence-tabs .p-tabview-nav {
+    background: transparent !important;
+    border: none !important;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.evidence-tabs .p-tabview-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.evidence-tabs .p-tabview-nav li {
+    margin: 0;
+}
+
+.evidence-tabs .p-tabview-nav li .p-tabview-nav-link {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    color: var(--text-color-secondary, #64748b) !important;
+    padding: 0.625rem 0.875rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease-in-out;
+    white-space: nowrap;
+    border-radius: 0 !important;
+}
+
+.evidence-tabs .p-tabview-nav li:not(.p-highlight) .p-tabview-nav-link:hover {
+    color: var(--primary-color, #2563eb) !important;
+    border-bottom-color: var(--primary-200, #bfdbfe) !important;
+}
+
+.evidence-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color, #2563eb) !important;
+    border-bottom-color: var(--primary-color, #2563eb) !important;
+    font-weight: 600 !important;
+}
+
+.evidence-tabs .p-tabview-panels {
+    background: transparent !important;
+    padding: 0.75rem 0 0 0 !important;
+    border: none !important;
+}
+
+/* Evidence Card */
+.evidence-card {
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--surface-border, #e2e8f0);
+    border-radius: 6px;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.evidence-card:hover {
+    border-color: var(--primary-200, #bfdbfe);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+}
+
+.evidence-card .p-card-body {
+    padding: 0.875rem 1rem !important;
+}
+
+.evidence-card .p-card-content {
+    padding: 0 !important;
+}
+
+/* Provenance Inspect Button */
+.btn-provenance-tag {
+    background: var(--surface-ground, #f8fafc);
+    border: 1px solid var(--surface-border, #e2e8f0);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--primary-color, #2563eb);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.btn-provenance-tag:hover {
+    background: var(--primary-50, #eff6ff);
+    border-color: var(--primary-color, #2563eb);
 }

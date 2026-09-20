@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
 import { TabView, TabPanel } from "primereact/tabview";
@@ -7,8 +8,13 @@ import { Chip } from "primereact/chip";
 import { Message } from "primereact/message";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { resolveTelemetryContext, getSignalLabel } from "../../utils/telemetryContext";
+import EvidenceProvenanceDialog from "./EvidenceProvenanceDialog";
+import "../../styles/components/investigation/evidence-panel.css";
 
 export default function EvidencePanel({ investigation }) {
+    const [selectedProvenance, setSelectedProvenance] = useState(null);
+    const [provenanceDialogOpen, setProvenanceDialogOpen] = useState(false);
+
     const rawEvidence = investigation?.report?.evidence || investigation?.final_report?.evidence || investigation?.evidence || [];
 
     // Normalize string-formatted evidence if present (e.g. serialized python repr)
@@ -67,9 +73,26 @@ export default function EvidencePanel({ investigation }) {
         return 'pi pi-info-circle';
     };
 
+    const getCategory = (item) => {
+        if (item.category && ["Performance", "Application", "Infrastructure"].includes(item.category)) {
+            return item.category;
+        }
+        const raw = (item.category || item.type || item.source || "").toLowerCase();
+        if (raw.includes("trace") || raw.includes("metric") || raw.includes("latency") || raw.includes("perf")) {
+            return "Performance";
+        }
+        if (raw.includes("log") || raw.includes("error") || raw.includes("exception") || raw.includes("app")) {
+            return "Application";
+        }
+        if (raw.includes("dep") || raw.includes("alert") || raw.includes("alarm") || raw.includes("infra") || raw.includes("host") || raw.includes("network")) {
+            return "Infrastructure";
+        }
+        return "Application";
+    };
+
     // Group evidence by category
     const groupedEvidence = evidence.reduce((groups, item) => {
-        const category = item.category || item.type || 'Other';
+        const category = getCategory(item);
         if (!groups[category]) {
             groups[category] = [];
         }
@@ -77,37 +100,91 @@ export default function EvidencePanel({ investigation }) {
         return groups;
     }, {});
 
+    const handleProvenanceClick = (item, telemetryCtx, signalLabel) => {
+        const isMock = telemetryCtx.provider.key === "mock" || telemetryCtx.provider.key === "demo" || telemetryCtx.mode.key === "DEMO";
+        const service = item.service_name || telemetryCtx.serviceName || "api-gateway";
+        const region = "us-east-1";
+        const rawType = (item.type || item.source || "").toLowerCase();
+
+        let specificProvider = telemetryCtx.provider.label;
+        if (!isMock) {
+            if (rawType.includes("trace")) specificProvider = "AWS X-Ray";
+            else if (rawType.includes("log") || rawType.includes("metric") || rawType.includes("alert")) specificProvider = "Amazon CloudWatch";
+        }
+
+        const traceId = item.trace_id || item.trace?.trace_id || item.raw?.trace_id || (item.evidence_id?.startsWith("1-") ? item.evidence_id : null);
+        const logGroup = item.log_group || item.raw?.log_group || (rawType.includes("log") ? "/aws/lambda/TattvaAI-Backend" : null);
+
+        let sourceUrl = null;
+        if (!isMock && traceId && traceId.startsWith("1-")) {
+            sourceUrl = `https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=${region}#xray:traces/${traceId}`;
+        } else if (!isMock && logGroup && logGroup.startsWith("/aws/")) {
+            sourceUrl = `https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/${encodeURIComponent(encodeURIComponent(logGroup))}`;
+        }
+
+        let acquisitionMethod = "";
+        if (isMock) {
+            acquisitionMethod = "Generated through TattvaAI's deterministic offline synthetic telemetry engine for payments degradation demonstration.";
+        } else if (rawType.includes("trace")) {
+            acquisitionMethod = "Retrieved directly from AWS X-Ray get_trace_summaries() API via backend IAM execution role.";
+        } else if (rawType.includes("log")) {
+            acquisitionMethod = "Retrieved from Amazon CloudWatch Logs filter_log_events() API via backend IAM execution role.";
+        } else if (rawType.includes("metric")) {
+            acquisitionMethod = "Retrieved from Amazon CloudWatch get_metric_data() API via backend IAM execution role.";
+        } else {
+            acquisitionMethod = `Retrieved securely via ${specificProvider} backend API integration.`;
+        }
+
+        setSelectedProvenance({
+            provider: specificProvider,
+            providerKey: telemetryCtx.provider.key,
+            mode: isMock ? "DEMO" : "LIVE",
+            signalType: signalLabel,
+            sourceId: traceId || logGroup || item.evidence_id || item.id,
+            timeRange: item.timestamp ? new Date(item.timestamp).toLocaleString() : (investigation.time_window || "Last 15 minutes"),
+            service,
+            region,
+            acquisitionMethod,
+            sourceUrl,
+            isMock,
+            description: item.summary || item.title
+        });
+        setProvenanceDialogOpen(true);
+    };
+
     const evidenceTemplate = (item, index) => {
         const severityInfo = getSeverityInfo(item.severity);
-        // Centralized resolution of provider and mode:
-        // Follows investigation source/mode, never infers "Mock / Demo" from item.source
         const telemetryCtx = resolveTelemetryContext(investigation, item);
         const signalLabel = getSignalLabel(item, telemetryCtx.provider.key);
 
         return (
             <Card className="evidence-card mb-3 surface-card border-1 surface-border shadow-1" key={index}>
-                <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between mb-3 gap-2">
+                <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between mb-2 gap-2">
                     <div className="flex align-items-center gap-2">
                         <i className={`${getEvidenceIcon(item.type)} text-primary`}
-                           style={{ fontSize: '1.25rem' }}></i>
-                        <h4 className="m-0 text-900 font-bold">{signalLabel}</h4>
+                           style={{ fontSize: '1.1rem' }}></i>
+                        <h4 className="m-0 text-900 font-semibold text-sm">{signalLabel}</h4>
                         <Tag
                             value={item.severity || "MEDIUM"}
                             severity={severityInfo.severity}
-                            className="font-semibold text-xs"
+                            className="font-semibold text-xs px-2 py-0"
                         />
                     </div>
                     <div className="flex align-items-center gap-2 flex-wrap">
-                        <Tag
-                            value={telemetryCtx.provider.label}
-                            icon={telemetryCtx.provider.icon}
-                            severity={telemetryCtx.provider.severity}
-                            className="text-xs"
-                        />
+                        <button
+                            type="button"
+                            className="btn-provenance-tag"
+                            onClick={() => handleProvenanceClick(item, telemetryCtx, signalLabel)}
+                            title="Inspect evidence provenance and source origin"
+                        >
+                            <i className={telemetryCtx.provider.icon}></i>
+                            <span>{telemetryCtx.provider.label}</span>
+                            <i className="pi pi-compass text-xs"></i>
+                        </button>
                         <Tag
                             value={telemetryCtx.mode.label}
                             severity={telemetryCtx.mode.severity}
-                            className="text-xs font-bold"
+                            className="text-xs font-bold px-2 py-0"
                         />
                         <Badge
                             value={`${item.confidence ?? 80}% Conf.`}
@@ -116,13 +193,13 @@ export default function EvidencePanel({ investigation }) {
                     </div>
                 </div>
 
-                <div className="mb-3">
-                    <p className="text-700 line-height-3 m-0">
+                <div className="mb-2">
+                    <p className="text-700 line-height-3 m-0 text-sm">
                         {item.summary || item.message || item.title || "No summary available"}
                     </p>
                 </div>
 
-                <div className="grid">
+                <div className="grid pt-1">
                     <div className="col-12 sm:col-6 md:col-4">
                         <div className="field m-0">
                             <label className="text-500 font-medium text-xs">Target Service</label>
@@ -142,8 +219,8 @@ export default function EvidencePanel({ investigation }) {
                                 <label className="text-500 font-medium text-xs">Timestamp</label>
                                 <div className="mt-1 flex align-items-center gap-2">
                                     <i className="pi pi-clock text-500 text-xs"></i>
-                                    <span className="text-700 text-xs">
-                                        {new Date(item.timestamp).toLocaleString()}
+                                    <span className="text-700 text-xs font-mono">
+                                        {new Date(item.timestamp).toLocaleTimeString()}
                                     </span>
                                 </div>
                             </div>
@@ -166,40 +243,29 @@ export default function EvidencePanel({ investigation }) {
 
                 {/* Trace Details if available */}
                 {(item.trace || item.raw?.duration_ms || item.operation) && (
-                    <Accordion className="mt-3">
-                        <AccordionTab header="Telemetry Signal Details">
-                            <div className="grid">
+                    <Accordion className="mt-2">
+                        <AccordionTab header={<span className="text-xs font-medium text-600">Signal Diagnostics</span>}>
+                            <div className="grid text-xs">
                                 <div className="col-12 md:col-6">
-                                    <div className="field">
-                                        <label className="text-600 font-medium text-sm">Operation</label>
-                                        <p className="m-0 mt-1 text-700">{item.operation || item.raw?.operation_name || 'N/A'}</p>
-                                    </div>
+                                    <span className="text-500 font-medium block">Operation</span>
+                                    <span className="text-800 font-mono">{item.operation || item.raw?.operation_name || 'N/A'}</span>
                                 </div>
-
                                 <div className="col-12 md:col-6">
-                                    <div className="field">
-                                        <label className="text-600 font-medium text-sm">Status Code</label>
-                                        <p className="m-0 mt-1 text-700">{item.trace?.status || item.raw?.status_code || '200'}</p>
-                                    </div>
+                                    <span className="text-500 font-medium block">Status Code</span>
+                                    <span className="text-800 font-semibold">{item.trace?.status || item.raw?.status_code || '200'}</span>
                                 </div>
-
                                 <div className="col-12 md:col-6">
-                                    <div className="field">
-                                        <label className="text-600 font-medium text-sm">Duration</label>
-                                        <p className="m-0 mt-1 text-700">
-                                            {item.trace?.duration_ms ? `${item.trace.duration_ms} ms` : item.raw?.duration_ms ? `${item.raw.duration_ms} ms` : 'N/A'}
-                                        </p>
-                                    </div>
+                                    <span className="text-500 font-medium block">Duration</span>
+                                    <span className="text-800 font-mono">
+                                        {item.trace?.duration_ms ? `${item.trace.duration_ms} ms` : item.raw?.duration_ms ? `${item.raw.duration_ms} ms` : 'N/A'}
+                                    </span>
                                 </div>
-
                                 {(item.trace_id || item.trace?.trace_id || item.raw?.trace_id) && (
                                     <div className="col-12">
-                                        <div className="field">
-                                            <label className="text-600 font-medium text-sm">Trace ID</label>
-                                            <p className="m-0 mt-1 text-700 font-mono text-sm">
-                                                {item.trace_id || item.trace?.trace_id || item.raw?.trace_id}
-                                            </p>
-                                        </div>
+                                        <span className="text-500 font-medium block">Trace ID</span>
+                                        <span className="text-800 font-mono">
+                                            {item.trace_id || item.trace?.trace_id || item.raw?.trace_id}
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -214,7 +280,7 @@ export default function EvidencePanel({ investigation }) {
         <div className="flex align-items-center justify-content-between">
             <div className="flex align-items-center gap-2">
                 <i className="pi pi-list text-700"></i>
-                <span className="font-semibold">Investigation Evidence</span>
+                <span className="font-semibold text-base">Investigation Evidence</span>
             </div>
             <Badge value={evidence.length} severity="info" />
         </div>
@@ -235,7 +301,7 @@ export default function EvidencePanel({ investigation }) {
     return (
         <Card header={headerTemplate} className="evidence-panel">
             {Object.keys(groupedEvidence).length > 1 ? (
-                <TabView>
+                <TabView className="evidence-tabs">
                     {Object.entries(groupedEvidence).map(([category, categoryEvidence]) => (
                         <TabPanel
                             key={category}
@@ -256,6 +322,13 @@ export default function EvidencePanel({ investigation }) {
                     layout="list"
                 />
             )}
+
+            {/* Evidence Provenance Dialog */}
+            <EvidenceProvenanceDialog
+                visible={provenanceDialogOpen}
+                onHide={() => setProvenanceDialogOpen(false)}
+                sourceData={selectedProvenance}
+            />
         </Card>
     );
 }

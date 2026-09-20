@@ -1028,3 +1028,53 @@ body {
   border-color: var(--primary-color, #0EA5E9) !important;
 }
 
+/* Investigation Contextual Sticky Sub-Navbar */
+.investigation-sticky-nav {
+  position: sticky;
+  top: var(--header-height, 60px);
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  padding: 0.5rem 0.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-radius: 6px;
+}
+
+.investigation-sticky-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.sticky-nav-item {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #4e6979);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.15s ease;
+}
+
+.sticky-nav-item:hover {
+  color: var(--primary-color, #0ea5e9);
+  background: var(--bg-primary, #f0f9ff);
+}
+
+.sticky-nav-item.active {
+  color: #0369a1;
+  background: #e0f2fe;
+  border-color: #bae6fd;
+  font-weight: 600;
+}
+

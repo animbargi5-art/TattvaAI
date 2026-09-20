@@ -1,10 +1,11 @@
 /* Investigation Card Component */
 
 .investigation-card {
-    border: 1px solid var(--surface-border);
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--surface-border, #e2e8f0);
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
 }
 

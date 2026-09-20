@@ -24,7 +24,7 @@ from app.core.security import (
     verify_password,
 )
 from app.database.user_repository import get_user_repository
-from app.schemas.auth import TokenResponse, UserLogin, UserOut, UserSignup
+from app.schemas.auth import TokenResponse, UserLogin, UserOut, UserSignup, is_work_email
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -80,13 +80,20 @@ def signup(payload: UserSignup):
     Register a new engineer profile, persist credentials safely with bcrypt,
     and return a persistent 7-day JWT session.
     """
+    # Enforce work / organizational email address
+    if not is_work_email(payload.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please use your work or organization email address.",
+        )
+
     repo = get_user_repository()
     try:
         existing = repo.get_by_email(payload.email)
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="An account with this email address already exists.",
+                detail="An account with this email already exists. Please sign in.",
             )
 
         hashed_password = get_password_hash(payload.password)

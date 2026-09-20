@@ -13,6 +13,24 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useAuth } from "../contexts/AuthContext";
 
+const DISALLOWED_DOMAINS = new Set([
+    "gmail.com", "googlemail.com", "yahoo.com", "ymail.com", "rocketmail.com",
+    "hotmail.com", "outlook.com", "live.com", "msn.com",
+    "icloud.com", "me.com", "mac.com",
+    "aol.com", "aim.com",
+    "proton.me", "protonmail.com", "pm.me",
+    "zoho.com", "zohomail.com",
+    "gmx.com", "gmx.net", "mail.com", "yandex.com", "yandex.ru", "mail.ru",
+    "inbox.com", "fastmail.com", "hushmail.com", "tutanota.com", "tuta.io",
+]);
+
+function isWorkEmail(email) {
+    if (!email || !email.includes("@")) return false;
+    const parts = email.trim().toLowerCase().split("@");
+    if (parts.length !== 2) return false;
+    return !DISALLOWED_DOMAINS.has(parts[1]);
+}
+
 export default function SignupPage() {
     const navigate = useNavigate();
     const { signup, isAuthenticated } = useAuth();
@@ -39,8 +57,14 @@ export default function SignupPage() {
             return;
         }
 
-        if (!email.trim()) {
-            setErrorMessage("Please enter a valid work email.");
+        const cleanEmail = email.trim().toLowerCase();
+        if (!cleanEmail) {
+            setErrorMessage("Please enter your work email.");
+            return;
+        }
+
+        if (!isWorkEmail(cleanEmail)) {
+            setErrorMessage("Please use your work or organization email address.");
             return;
         }
 
@@ -51,7 +75,7 @@ export default function SignupPage() {
 
         setIsLoading(true);
         try {
-            await signup(name.trim(), email.trim(), password);
+            await signup(name.trim(), cleanEmail, password);
             navigate("/dashboard", { replace: true });
         } catch (err) {
             console.error("[Signup] Registration failed:", err);
@@ -76,9 +100,22 @@ export default function SignupPage() {
                 </div>
 
                 {errorMessage && (
-                    <div className="auth-error-banner">
-                        <i className="pi pi-exclamation-circle"></i>
-                        <span>{errorMessage}</span>
+                    <div className="auth-error-banner flex flex-column gap-2">
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-exclamation-circle text-lg"></i>
+                            <span className="font-medium text-sm">{errorMessage}</span>
+                        </div>
+                        {errorMessage.toLowerCase().includes("already exists") && (
+                            <div className="mt-1 pt-1 border-top-1 border-red-200">
+                                <Link 
+                                    to="/login" 
+                                    className="font-bold text-sm text-primary hover:underline flex align-items-center gap-1"
+                                >
+                                    <span>Sign in to existing account</span>
+                                    <i className="pi pi-arrow-right text-xs"></i>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 

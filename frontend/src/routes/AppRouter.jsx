@@ -32,6 +32,8 @@ export default function AppRouter() {
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/report" element={<Navigate to="/reports" replace />} />
                     <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/investigations" element={<InvestigationPage />} />
+                    <Route path="/investigation" element={<Navigate to="/investigations" replace />} />
                     <Route path="/investigation/:id" element={<InvestigationPage />} />
                 </Route>
             </Route>
