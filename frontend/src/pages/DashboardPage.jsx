@@ -269,6 +269,7 @@ export default function DashboardPage() {
                         onClick={refreshDashboard}
                         loading={statsLoading || investigationsLoading}
                         tooltip="Refresh Dashboard"
+                        tooltipOptions={{ position: 'bottom', showDelay: 150 }}
                     />
                 </div>
             </div>
@@ -287,24 +288,11 @@ export default function DashboardPage() {
             {/* Status and Progress Blocks */}
             <div className="grid mb-4">
                 <div className="col-12 lg:col-6">
-                    <Card className="investigation-status-block h-full">
-                        <div className="card-header-clean">
-                            <div className="card-header-title-group">
-                                <div className="card-icon-badge">
-                                    <i className="pi pi-info-circle"></i>
-                                </div>
-                                <div>
-                                    <h3 className="card-header-title">Investigation Status</h3>
-                                    <p className="card-header-subtitle">Real-time incident state and progress</p>
-                                </div>
-                            </div>
-                        </div>
-                        <InvestigationStatus 
-                            status={investigationStatus}
-                            loading={statusLoading}
-                            running={isInvestigationRunning || investigationStatus?.status === 'running'}
-                        />
-                    </Card>
+                    <InvestigationStatus 
+                        status={investigationStatus}
+                        loading={statusLoading}
+                        running={isInvestigationRunning || investigationStatus?.status === 'running'}
+                    />
                 </div>
                 <div className="col-12 lg:col-6">
                     <Card className="investigation-progress-block h-full">
@@ -380,7 +368,8 @@ export default function DashboardPage() {
                 }
                 visible={isLaunchModalOpen}
                 onHide={() => setIsLaunchModalOpen(false)}
-                style={{ width: '90vw', maxWidth: '640px' }}
+                style={{ width: '90vw', maxWidth: '580px' }}
+                contentStyle={{ maxHeight: 'calc(85vh - 120px)', overflowY: 'auto', padding: '1rem 1.25rem' }}
                 footer={
                     <div className="flex justify-content-end gap-2 pt-2">
                         <Button

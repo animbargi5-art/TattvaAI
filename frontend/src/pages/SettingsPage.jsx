@@ -3,6 +3,7 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Message } from "primereact/message";
+import { Tag } from "primereact/tag";
 
 import telemetryService from "../services/telemetryService";
 
@@ -14,11 +15,12 @@ export default function SettingsPage() {
     const [activeProvider, setActiveProvider] = useState(() => telemetryService.getActiveProvider() || "aws");
     const [telemetryMode, setTelemetryMode] = useState("live");
     const [awsRegion, setAwsRegion] = useState("us-east-1");
-    const [awsBackend] = useState("CloudWatch & X-Ray (Unified)");
+    const [awsBackend] = useState("CloudWatch + X-Ray");
 
-    // SigNoz & Otel parameters (preserved for full capability)
-    const [signozEndpoint, setSignozEndpoint] = useState(import.meta.env.VITE_SIGNOZ_URL || "http://localhost:3301");
-    const [signozQueryEndpoint, setSignozQueryEndpoint] = useState("http://localhost:3301/api/v1");
+    // Live provider test state
+    const [testResult, setTestResult] = useState(null);
+    const [isTesting, setIsTesting] = useState(false);
+    const [lastVerified, setLastVerified] = useState(null);
 
     // Feedback message
     const [saveSuccess, setSaveSuccess] = useState(false);
@@ -43,6 +45,33 @@ export default function SettingsPage() {
         { label: "Asia Pacific (Mumbai) — ap-south-1", value: "ap-south-1" }
     ];
 
+    const runConnectivityTest = useCallback(async (prov = selectedProvider, reg = awsRegion) => {
+        setIsTesting(true);
+        try {
+            const res = await telemetryService.testProviderConnection({
+                provider: prov,
+                region: reg
+            });
+            setTestResult(res);
+            setLastVerified(new Date().toLocaleTimeString());
+        } catch (err) {
+            setTestResult({
+                connected: false,
+                provider: prov,
+                message: `Connection test error: ${err.message || "Endpoint unavailable"}`,
+                capabilities: [],
+                mode: prov === "mock" ? "DEMO" : "LIVE"
+            });
+            setLastVerified(new Date().toLocaleTimeString());
+        } finally {
+            setIsTesting(false);
+        }
+    }, [selectedProvider, awsRegion]);
+
+    useEffect(() => {
+        runConnectivityTest(selectedProvider, awsRegion);
+    }, [selectedProvider, awsRegion, runConnectivityTest]);
+
     const handleSaveChanges = () => {
         telemetryService.setActiveProvider(selectedProvider);
         setActiveProvider(selectedProvider);
@@ -50,6 +79,27 @@ export default function SettingsPage() {
         window.dispatchEvent(new CustomEvent("tattvaai:provider-changed", { detail: { provider: selectedProvider } }));
         setTimeout(() => setSaveSuccess(false), 4000);
     };
+
+    const cloudWatchConsoleUrl = `https://${awsRegion}.console.aws.amazon.com/cloudwatch/home?region=${awsRegion}`;
+    const xrayConsoleUrl = `https://${awsRegion}.console.aws.amazon.com/cloudwatch/home?region=${awsRegion}#xray:traces`;
+
+    const getStatusDisplay = () => {
+        if (isTesting) {
+            return { label: "CHECKING...", severity: "info", icon: "pi pi-spin pi-spinner" };
+        }
+        if (selectedProvider === "mock") {
+            return { label: "DEMO / READY", severity: "warning", icon: "pi pi-box" };
+        }
+        if (testResult?.connected) {
+            return { label: "LIVE", severity: "success", icon: "pi pi-wifi" };
+        }
+        if (testResult && !testResult.connected) {
+            return { label: "UNAVAILABLE", severity: "danger", icon: "pi pi-times" };
+        }
+        return { label: "LIVE", severity: "success", icon: "pi pi-wifi" };
+    };
+
+    const statusDisplay = getStatusDisplay();
 
     return (
         <div className="settings-container">
@@ -64,6 +114,7 @@ export default function SettingsPage() {
                 {["Telemetry", "Application", "Notifications", "Account", "Security"].map((tab) => (
                     <button
                         key={tab}
+                        type="button"
                         className={`clean-tab-item ${activeTab === tab ? "active" : ""}`}
                         onClick={() => setActiveTab(tab)}
                     >
@@ -86,22 +137,26 @@ export default function SettingsPage() {
             {activeTab === "Telemetry" && (
                 <>
                     {/* Card 1: Telemetry Provider Settings */}
-                    <div className="clean-card">
+                    <div className="clean-card mb-4">
                         <div className="card-header-clean">
                             <div className="card-header-title-group">
                                 <div className="card-icon-badge">
                                     <i className="pi pi-database"></i>
                                 </div>
                                 <div>
-                                    <h2 className="card-header-title">Telemetry Provider Settings</h2>
+                                    <h2 className="card-header-title">Telemetry Provider Configuration</h2>
                                     <p className="card-header-subtitle">
                                         Select and configure the observability provider for TattvaAI's investigation pipeline.
                                     </p>
                                 </div>
                             </div>
-                            <div className="status-pill status-pill-success">
-                                <span className="status-dot-green"></span>
-                                <span>Active Source: AWS Observability</span>
+                            <div className="flex align-items-center gap-2">
+                                <Tag
+                                    value={statusDisplay.label}
+                                    severity={statusDisplay.severity}
+                                    icon={statusDisplay.icon}
+                                    className="font-bold text-xs px-2 py-1"
+                                />
                             </div>
                         </div>
 
@@ -131,7 +186,7 @@ export default function SettingsPage() {
                                     className="w-full"
                                 />
                                 <span className="form-field-helper">
-                                    Use live data from your AWS environment.
+                                    Use live data from your AWS environment or deterministic simulation.
                                 </span>
                             </div>
 
@@ -140,7 +195,7 @@ export default function SettingsPage() {
                                 <Dropdown
                                     value={awsRegion}
                                     options={regionOptions}
-                                    onChange={(e) => setAwsRegion(e.target.value)}
+                                    onChange={(e) => setAwsRegion(e.value)}
                                     placeholder="Select AWS Region"
                                     className="w-full"
                                 />
@@ -158,50 +213,143 @@ export default function SettingsPage() {
                                     style={{ background: "#F8FAFC" }}
                                 />
                                 <span className="form-field-helper">
-                                    Default stack for AWS observability.
+                                    Unified AWS CloudWatch Logs/Metrics + AWS X-Ray Tracing.
                                 </span>
                             </div>
                         </div>
 
-                        {/* Informational Callout Box */}
-                        <div className="callout-box-blue">
-                            <div className="callout-box-header">
-                                <i className="pi pi-info-circle text-primary" style={{ fontSize: "1.05rem" }}></i>
-                                <span className="callout-box-title">AWS Observability</span>
+                        {/* Live Backend Provider Status & Real Data Details */}
+                        <div className="surface-ground border-1 surface-border border-round p-3 mt-3">
+                            <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-2 pb-3 mb-3 border-bottom-1 surface-border">
+                                <div>
+                                    <div className="font-bold text-sm text-900 flex align-items-center gap-2">
+                                        <i className="pi pi-server text-primary"></i>
+                                        <span>Backend Provider Verification</span>
+                                    </div>
+                                    <div className="text-xs text-500 mt-1">
+                                        {testResult?.message || "Validating provider status via backend..."}
+                                    </div>
+                                </div>
+                                <div className="flex align-items-center gap-2">
+                                    <Button
+                                        label={isTesting ? "Testing..." : "Test Connection"}
+                                        icon="pi pi-bolt"
+                                        size="small"
+                                        outlined
+                                        loading={isTesting}
+                                        onClick={() => runConnectivityTest(selectedProvider, awsRegion)}
+                                    />
+                                </div>
                             </div>
-                            <p className="callout-box-desc">
-                                AWS CloudWatch metrics/logs and AWS X-Ray distributed traces via IAM credentials.
-                            </p>
-                            <div>
-                                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 500, marginRight: "0.5rem" }}>
-                                    Supported Capabilities:
-                                </span>
-                                <div className="callout-chip-row" style={{ display: "inline-flex" }}>
-                                    {["traces", "logs", "metrics", "alerts", "dependencies"].map((cap) => (
-                                        <span key={cap} className="clean-chip">{cap}</span>
+
+                            {/* Structured 2-Column Grid of Actual Provider State */}
+                            <div className="grid text-xs">
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">Telemetry Provider:</span>
+                                    <span className="font-semibold text-800 text-sm">
+                                        {selectedProvider === "aws" ? "AWS Observability" :
+                                         selectedProvider === "signoz" ? "SigNoz Observability" :
+                                         selectedProvider === "opentelemetry" ? "OpenTelemetry Backend" : "Mock / Demo"}
+                                    </span>
+                                </div>
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">Mode:</span>
+                                    <span className="font-semibold text-800 text-sm">
+                                        {selectedProvider === "mock" ? "Simulation (Demo)" : "Live Telemetry"}
+                                    </span>
+                                </div>
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">AWS Region:</span>
+                                    <span className="font-mono font-semibold text-800 text-sm">{awsRegion}</span>
+                                </div>
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">Observability Stack:</span>
+                                    <span className="font-semibold text-800 text-sm">CloudWatch + X-Ray</span>
+                                </div>
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">Connection Status:</span>
+                                    <span className="font-bold text-sm flex align-items-center gap-1">
+                                        <Tag
+                                            value={statusDisplay.label}
+                                            severity={statusDisplay.severity}
+                                            className="text-xs px-2 py-0"
+                                        />
+                                    </span>
+                                </div>
+                                <div className="col-12 sm:col-6 md:col-4 py-1">
+                                    <span className="text-500 font-medium block">Last Verified:</span>
+                                    <span className="font-mono text-700 text-sm">{lastVerified || "Just now"}</span>
+                                </div>
+                            </div>
+
+                            {/* Supported Capabilities */}
+                            <div className="pt-3 mt-2 border-top-1 surface-border">
+                                <span className="text-500 font-medium text-xs mr-2">Active Capabilities:</span>
+                                <div className="inline-flex flex-wrap gap-1 mt-1">
+                                    {["Traces", "Logs", "Metrics", "Alerts", "Dependencies"].map((cap) => (
+                                        <span key={cap} className="surface-100 text-700 text-xs px-2 py-1 border-round font-medium">
+                                            {cap}
+                                        </span>
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Genuine AWS Console Navigation Links */}
+                        <div className="mt-3 pt-3 border-top-1 surface-border flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-2">
+                            <span className="text-xs text-500">
+                                Open AWS Console in region <span className="font-mono font-bold text-700">{awsRegion}</span>:
+                            </span>
+                            <div className="flex gap-2">
+                                <a
+                                    href={cloudWatchConsoleUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ textDecoration: "none" }}
+                                >
+                                    <Button
+                                        label="CloudWatch Console"
+                                        icon="pi pi-external-link"
+                                        size="small"
+                                        text
+                                        className="p-button-sm text-xs"
+                                    />
+                                </a>
+                                <a
+                                    href={xrayConsoleUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ textDecoration: "none" }}
+                                >
+                                    <Button
+                                        label="X-Ray Traces Console"
+                                        icon="pi pi-external-link"
+                                        size="small"
+                                        text
+                                        className="p-button-sm text-xs"
+                                    />
+                                </a>
                             </div>
                         </div>
                     </div>
 
                     {/* Card 2: AWS IAM Configuration */}
-                    <div className="clean-card">
+                    <div className="clean-card mb-4">
                         <div className="card-header-clean">
                             <div className="card-header-title-group">
                                 <div className="card-icon-badge">
                                     <i className="pi pi-shield"></i>
                                 </div>
                                 <div>
-                                    <h2 className="card-header-title">AWS IAM Configuration</h2>
+                                    <h2 className="card-header-title">AWS IAM Security & Credentials</h2>
                                     <p className="card-header-subtitle">
-                                        Manage the IAM role used to access AWS observability services.
+                                        Serverless IAM role execution management.
                                     </p>
                                 </div>
                             </div>
-                            <div className="status-pill status-pill-info">
+                            <div className="status-pill status-pill-success">
                                 <i className="pi pi-lock" style={{ fontSize: "0.75rem" }}></i>
-                                <span>Managed Securely</span>
+                                <span>Zero Secrets Exposed</span>
                             </div>
                         </div>
 
@@ -212,7 +360,7 @@ export default function SettingsPage() {
                                     <i className="pi pi-key"></i>
                                 </div>
                                 <div>
-                                    <div className="callout-box-title">IAM Credentials</div>
+                                    <div className="callout-box-title">IAM Execution Role</div>
                                     <div style={{ fontSize: "0.8125rem", color: "var(--text-secondary)", marginTop: "2px" }}>
                                         Managed via AWS Lambda Execution Role. No access keys, secret keys, or credentials are exposed in the frontend.
                                     </div>
@@ -295,7 +443,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="status-pill status-pill-success">
                             <i className="pi pi-shield"></i>
-                            <span>JWT Verified (24h)</span>
+                            <span>JWT Verified (7d)</span>
                         </div>
                     </div>
                     <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>

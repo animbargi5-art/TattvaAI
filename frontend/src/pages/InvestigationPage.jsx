@@ -292,7 +292,8 @@ export default function InvestigationPage() {
                     }
                     visible={isLaunchModalOpen}
                     onHide={() => setIsLaunchModalOpen(false)}
-                    style={{ width: "90vw", maxWidth: "600px" }}
+                    style={{ width: "90vw", maxWidth: "580px" }}
+                    contentStyle={{ maxHeight: "calc(85vh - 120px)", overflowY: "auto", padding: "1rem 1.25rem" }}
                     footer={
                         <div className="flex justify-content-end gap-2 pt-2">
                             <Button

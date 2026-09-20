@@ -23,165 +23,108 @@ export default function EvidenceProvenanceDialog({ visible, onHide, sourceData }
         description = ""
     } = sourceData;
 
-    const isLive = mode === "LIVE" && !isMock;
-
     return (
         <Dialog
             header={
                 <div className="flex align-items-center gap-2">
                     <i className="pi pi-compass text-primary text-xl"></i>
                     <div>
-                        <span className="font-bold text-lg text-900">
+                        <span className="font-bold text-base text-900 block">
                             Telemetry Provenance & Source Inspection
                         </span>
-                        <div className="text-xs text-500 font-normal">
+                        <span className="text-xs text-500 font-normal">
                             Where did this evidence come from?
-                        </div>
+                        </span>
                     </div>
                 </div>
             }
             visible={visible}
             onHide={onHide}
-            style={{ width: "90vw", maxWidth: "620px" }}
+            style={{ width: "90vw", maxWidth: "560px" }}
+            contentStyle={{ maxHeight: "calc(85vh - 110px)", overflowY: "auto", padding: "1rem 1.25rem" }}
             footer={
                 <div className="flex justify-content-between align-items-center gap-2 pt-2">
-                    <div className="text-xs text-500">
+                    <div className="text-xs">
                         {isMock ? (
                             <span className="text-orange-600 font-medium flex align-items-center gap-1">
-                                <i className="pi pi-info-circle"></i>
+                                <i className="pi pi-box text-xs"></i>
                                 Synthetic Demonstration Data
                             </span>
                         ) : (
                             <span className="text-green-600 font-medium flex align-items-center gap-1">
-                                <i className="pi pi-check-circle"></i>
+                                <i className="pi pi-check-circle text-xs"></i>
                                 Verified Production Telemetry
                             </span>
                         )}
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            label="Close"
-                            icon="pi pi-times"
-                            severity="secondary"
-                            outlined
-                            onClick={onHide}
-                        />
-                        {sourceUrl && (
-                            <a
-                                href={sourceUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{ textDecoration: "none" }}
-                            >
-                                <Button
-                                    label="View in AWS Console"
-                                    icon="pi pi-external-link"
-                                    severity="primary"
-                                />
-                            </a>
-                        )}
-                    </div>
+                    <Button
+                        label="Close"
+                        icon="pi pi-times"
+                        severity="secondary"
+                        size="small"
+                        outlined
+                        onClick={onHide}
+                    />
                 </div>
             }
         >
-            <div className="flex flex-column gap-3 pt-2">
-                {/* Provider & Mode Banner */}
-                <div className="surface-ground p-3 border-round border-1 surface-border flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-2">
+            <div className="flex flex-column gap-3 pt-1">
+                {/* Header Status Row */}
+                <div className="flex align-items-center justify-content-between surface-ground px-3 py-2 border-round border-1 surface-border">
                     <div className="flex align-items-center gap-2">
-                        <i className={isMock ? "pi pi-box text-orange-500 text-xl" : "pi pi-cloud text-primary text-xl"}></i>
-                        <div>
-                            <div className="font-bold text-900 text-sm">{provider}</div>
-                            <div className="text-xs text-600">{agentName ? `${agentName} Stage` : signalType}</div>
-                        </div>
+                        <i className={isMock ? "pi pi-box text-orange-500" : "pi pi-cloud text-primary"}></i>
+                        <span className="font-semibold text-sm text-900">{provider}</span>
+                        <span className="text-xs text-500">({agentName ? `${agentName} Stage` : signalType})</span>
                     </div>
-                    <div className="flex align-items-center gap-2">
-                        <Tag
-                            value={isMock ? "SYNTHETIC DEMO" : "LIVE TELEMETRY"}
-                            severity={isMock ? "warning" : "success"}
-                            className="text-xs font-bold px-2 py-1"
-                            icon={isMock ? "pi pi-box" : "pi pi-wifi"}
-                        />
-                    </div>
+                    <Tag
+                        value={isMock ? "SYNTHETIC DEMO" : "LIVE TELEMETRY"}
+                        severity={isMock ? "warning" : "success"}
+                        className="text-xs font-bold px-2 py-0"
+                    />
                 </div>
 
                 {/* Synthetic Warning if Mock */}
                 {isMock && (
-                    <div className="surface-orange-50 p-3 border-round border-1 border-orange-200">
+                    <div className="surface-orange-50 p-2 border-round border-1 border-orange-200">
                         <div className="flex align-items-start gap-2">
-                            <i className="pi pi-exclamation-triangle text-orange-600 mt-1"></i>
-                            <div className="text-xs text-orange-900 line-height-3">
-                                <strong>Synthetic Telemetry Notice:</strong> This evidence is generated by the Mock/Demo provider and is not live telemetry. It represents a deterministic test scenario for offline evaluation and developer demonstration.
+                            <i className="pi pi-info-circle text-orange-600 text-xs mt-1"></i>
+                            <div className="text-xs text-orange-900 line-height-2">
+                                <strong>Deterministic Demo Notice:</strong> Generated by the Mock/Demo provider for offline demonstration and evaluation.
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Provenance Metadata Grid */}
-                <div className="grid">
-                    <div className="col-12 sm:col-6">
-                        <div className="surface-card p-2 border-round border-1 surface-border h-full">
-                            <span className="text-500 font-medium text-xs block mb-1">Source Provider</span>
-                            <span className="font-semibold text-800 text-sm flex align-items-center gap-1">
-                                <i className="pi pi-server text-xs text-primary"></i>
-                                {provider}
+                {/* 2-Column Responsive Information Grid */}
+                <div className="surface-card border-round border-1 surface-border p-3">
+                    <div className="grid">
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">Provider</span>
+                            <span className="font-semibold text-800 text-sm">{provider}</span>
+                        </div>
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">Signal</span>
+                            <span className="font-semibold text-800 text-sm">{signalType}</span>
+                        </div>
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">Service / Resource</span>
+                            <span className="font-mono text-800 text-sm font-semibold">{service}</span>
+                        </div>
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">Analysis Window</span>
+                            <span className="font-semibold text-800 text-sm">{timeRange}</span>
+                        </div>
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">Source Identifier</span>
+                            <span className="font-mono text-xs text-800 block overflow-hidden text-overflow-ellipsis font-semibold">
+                                {sourceId || (isMock ? "mock-trace-id" : "N/A")}
                             </span>
                         </div>
-                    </div>
-
-                    <div className="col-12 sm:col-6">
-                        <div className="surface-card p-2 border-round border-1 surface-border h-full">
-                            <span className="text-500 font-medium text-xs block mb-1">Signal Type</span>
-                            <span className="font-semibold text-800 text-sm flex align-items-center gap-1">
-                                <i className="pi pi-bolt text-xs text-primary"></i>
-                                {signalType}
-                            </span>
+                        <div className="col-12 sm:col-6 py-1">
+                            <span className="text-500 font-medium text-xs block">AWS Region</span>
+                            <span className="font-mono text-800 text-sm font-semibold">{region}</span>
                         </div>
                     </div>
-
-                    <div className="col-12 sm:col-6">
-                        <div className="surface-card p-2 border-round border-1 surface-border h-full">
-                            <span className="text-500 font-medium text-xs block mb-1">Service / Resource</span>
-                            <span className="font-semibold text-800 text-sm font-mono flex align-items-center gap-1">
-                                <i className="pi pi-box text-xs text-primary"></i>
-                                {service}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="col-12 sm:col-6">
-                        <div className="surface-card p-2 border-round border-1 surface-border h-full">
-                            <span className="text-500 font-medium text-xs block mb-1">Analysis Window</span>
-                            <span className="font-semibold text-800 text-sm flex align-items-center gap-1">
-                                <i className="pi pi-clock text-xs text-primary"></i>
-                                {timeRange}
-                            </span>
-                        </div>
-                    </div>
-
-                    {sourceId && (
-                        <div className="col-12">
-                            <div className="surface-card p-2 border-round border-1 surface-border">
-                                <span className="text-500 font-medium text-xs block mb-1">
-                                    Source Identifier (Trace ID / Log Group / Resource)
-                                </span>
-                                <span className="font-mono text-xs text-900 surface-ground px-2 py-1 border-round block overflow-hidden text-overflow-ellipsis">
-                                    {sourceId}
-                                </span>
-                            </div>
-                        </div>
-                    )}
-
-                    {providerKey === "aws" && (
-                        <div className="col-12 sm:col-6">
-                            <div className="surface-card p-2 border-round border-1 surface-border h-full">
-                                <span className="text-500 font-medium text-xs block mb-1">AWS Region</span>
-                                <span className="font-semibold text-800 text-sm font-mono flex align-items-center gap-1">
-                                    <i className="pi pi-globe text-xs text-primary"></i>
-                                    {region}
-                                </span>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <Divider className="my-1" />
@@ -189,7 +132,7 @@ export default function EvidenceProvenanceDialog({ visible, onHide, sourceData }
                 {/* How TattvaAI Obtained This Evidence */}
                 <div>
                     <span className="text-700 font-semibold text-xs block mb-1">
-                        How TattvaAI Obtained This Evidence:
+                        How TattvaAI Obtained This Evidence
                     </span>
                     <p className="text-600 text-xs line-height-3 m-0 surface-ground p-2 border-round border-1 surface-border">
                         {acquisitionMethod || (
@@ -200,24 +143,45 @@ export default function EvidenceProvenanceDialog({ visible, onHide, sourceData }
                     </p>
                 </div>
 
-                {/* External Console Link Status */}
+                <Divider className="my-1" />
+
+                {/* Source / Console */}
                 <div>
                     <span className="text-700 font-semibold text-xs block mb-1">
-                        Console / Source Link Status:
+                        Source / Console
                     </span>
                     {sourceUrl ? (
-                        <div className="text-xs text-green-700 surface-green-50 p-2 border-round border-1 border-green-200 flex align-items-center gap-2">
-                            <i className="pi pi-check text-green-600"></i>
-                            <span>Verified deep link available to external AWS console for this identifier.</span>
+                        <div className="flex flex-column sm:flex-row sm:align-items-center justify-content-between surface-green-50 border-1 border-green-200 border-round p-2 gap-2">
+                            <span className="text-xs text-green-700 font-medium flex align-items-center gap-1">
+                                <i className="pi pi-check text-green-600"></i>
+                                Verified deep link available
+                            </span>
+                            <a
+                                href={sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ textDecoration: "none" }}
+                            >
+                                <Button
+                                    label="View in AWS Console"
+                                    icon="pi pi-external-link"
+                                    size="small"
+                                    className="btn-primary"
+                                />
+                            </a>
                         </div>
                     ) : (
-                        <div className="text-xs text-600 surface-ground p-2 border-round border-1 surface-border flex align-items-center gap-2">
-                            <i className="pi pi-info-circle text-500"></i>
-                            <span>
-                                {isMock
-                                    ? "External console link unavailable: Mock evidence is synthetic and does not exist in an external observability platform."
-                                    : "External deep link not configured for this telemetry signal."}
-                            </span>
+                        <div className="text-xs text-600 surface-ground p-2 border-round border-1 surface-border">
+                            {isMock ? (
+                                <span>External console link unavailable: Mock evidence is synthetic and does not exist in an external observability platform.</span>
+                            ) : sourceId ? (
+                                <div>
+                                    <span className="font-medium text-700 block">Source available in AWS {provider}:</span>
+                                    <span className="font-mono text-xs text-500">Trace / Resource ID: {sourceId}</span>
+                                </div>
+                            ) : (
+                                <span>No external deep link configured for this telemetry signal.</span>
+                            )}
                         </div>
                     )}
                 </div>

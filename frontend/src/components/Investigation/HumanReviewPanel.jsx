@@ -322,6 +322,7 @@ export default function HumanReviewPanel({ investigation, onReviewSubmitted }) {
                         <Button
                             label={isSubmitting ? "Submitting..." : "Submit Review"}
                             icon="pi pi-send"
+                            className="btn-primary"
                             loading={isSubmitting}
                             onClick={handleSubmit}
                         />

@@ -286,42 +286,54 @@ export default function EvidencePanel({ investigation }) {
         </div>
     );
 
-    if (evidence.length === 0) {
-        return (
-            <Card header={headerTemplate} className="evidence-panel">
-                <Message
-                    severity="info"
-                    text="No evidence available for this investigation."
-                    className="w-full"
-                />
-            </Card>
-        );
-    }
-
     return (
         <Card header={headerTemplate} className="evidence-panel">
-            {Object.keys(groupedEvidence).length > 1 ? (
-                <TabView className="evidence-tabs">
-                    {Object.entries(groupedEvidence).map(([category, categoryEvidence]) => (
-                        <TabPanel
-                            key={category}
-                            header={`${category} (${categoryEvidence.length})`}
-                        >
-                            <DataView
-                                value={categoryEvidence}
-                                itemTemplate={evidenceTemplate}
-                                layout="list"
-                            />
-                        </TabPanel>
-                    ))}
-                </TabView>
-            ) : (
-                <DataView
-                    value={evidence}
-                    itemTemplate={evidenceTemplate}
-                    layout="list"
-                />
-            )}
+            <TabView className="evidence-tabs">
+                <TabPanel header={`Performance (${groupedEvidence["Performance"]?.length || 0})`}>
+                    {(groupedEvidence["Performance"]?.length || 0) > 0 ? (
+                        <DataView
+                            value={groupedEvidence["Performance"]}
+                            itemTemplate={evidenceTemplate}
+                            layout="list"
+                        />
+                    ) : (
+                        <div className="py-4 text-center surface-ground border-round my-2">
+                            <i className="pi pi-check-circle text-green-500 text-lg mb-1 block"></i>
+                            <span className="text-500 text-xs">No performance or latency anomalies flagged in this window.</span>
+                        </div>
+                    )}
+                </TabPanel>
+
+                <TabPanel header={`Application (${groupedEvidence["Application"]?.length || 0})`}>
+                    {(groupedEvidence["Application"]?.length || 0) > 0 ? (
+                        <DataView
+                            value={groupedEvidence["Application"]}
+                            itemTemplate={evidenceTemplate}
+                            layout="list"
+                        />
+                    ) : (
+                        <div className="py-4 text-center surface-ground border-round my-2">
+                            <i className="pi pi-check-circle text-green-500 text-lg mb-1 block"></i>
+                            <span className="text-500 text-xs">No application exceptions or error spikes flagged in this window.</span>
+                        </div>
+                    )}
+                </TabPanel>
+
+                <TabPanel header={`Infrastructure (${groupedEvidence["Infrastructure"]?.length || 0})`}>
+                    {(groupedEvidence["Infrastructure"]?.length || 0) > 0 ? (
+                        <DataView
+                            value={groupedEvidence["Infrastructure"]}
+                            itemTemplate={evidenceTemplate}
+                            layout="list"
+                        />
+                    ) : (
+                        <div className="py-4 text-center surface-ground border-round my-2">
+                            <i className="pi pi-check-circle text-green-500 text-lg mb-1 block"></i>
+                            <span className="text-500 text-xs">No infrastructure alarms or dependency faults flagged in this window.</span>
+                        </div>
+                    )}
+                </TabPanel>
+            </TabView>
 
             {/* Evidence Provenance Dialog */}
             <EvidenceProvenanceDialog

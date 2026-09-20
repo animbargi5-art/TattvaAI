@@ -129,6 +129,13 @@
 .decision-btn {
     flex: 1;
     min-width: 120px;
+    height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
 }
 
 .reviewed-summary-card {

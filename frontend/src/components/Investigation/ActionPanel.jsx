@@ -55,14 +55,15 @@ export default function ActionPanel({
                 <Divider className="my-1" />
 
                 <div className="flex flex-wrap gap-3 justify-content-between align-items-center">
-                    {/* Primary Actions */}
-                    <div className="flex flex-wrap gap-2">
+                    {/* Primary & Secondary Actions */}
+                    <div className="flex flex-wrap gap-2 align-items-center">
                         <Button
                             label="Refresh Investigation"
                             icon="pi pi-refresh"
                             onClick={onRefresh}
                             loading={refreshLoading}
-                            severity="info"
+                            severity="primary"
+                            className="btn-primary"
                             size="small"
                             tooltip="Re-run the AI investigation analysis workflow"
                             tooltipOptions={{ position: 'top' }}
@@ -71,7 +72,7 @@ export default function ActionPanel({
                         <Button
                             label="Export PDF"
                             icon={currentExportFormat === 'pdf' ? "pi pi-spin pi-spinner" : "pi pi-file-pdf"}
-                            severity="danger"
+                            severity="secondary"
                             outlined
                             size="small"
                             onClick={() => handleExportClick('pdf')}
