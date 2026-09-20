@@ -105,7 +105,7 @@ async def list_scenarios():
 
 @router.post("/trigger/{scenario}", response_model=IncidentTriggerResponse)
 async def trigger_incident(
-    scenario: str = Query(..., description="Scenario name: HEALTHY, PAYMENT_TIMEOUT, PAYMENT_FAILURE, HIGH_LATENCY, DEPENDENCY_FAILURE")
+    scenario: str
 ):
     """
     Trigger a controlled incident scenario.
